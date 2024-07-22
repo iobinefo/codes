@@ -18,23 +18,26 @@ global Uganda_GHS_W5_created_data    "C:\Users\obine\Music\Documents\Project\cod
 * AG FILTER *
 ********************************************************************************
 
-use "${Uganda_GHS_W5_raw_data}\gsec1.dta",clear 
+use "${Uganda_GHS_W5_raw_data}\gsec19.dta", clear
+
+ren hhid HHID
 
  
 
-merge 1:1 HHID using "${Uganda_GHS_W5_raw_data}\gsec19.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_raw_data}\gsec1.dta"
 
+des
 
+gen ag_rainy_15 = (h19q1==1)
+tab ag_rainy_15
 
-gen ag_rainy_13 = (h19q1==1)
-tab ag_rainy_13
+ren district pash
 
+ren  h1bq6a  stratum
+ren hwgt_W4_W5  weight
+ren sregion  district 
 
-ren  h1aq1a district
-ren wgt  weight
-ren sregion stratum
-
-keep  region stratum district ea weight ag_rainy_13 HHID HHID_old
+keep  region stratum district ea weight ag_rainy_15 HHID hh
 
 
 *collapse (max) ag_rainy_10, by (HHID)
@@ -120,13 +123,10 @@ save "${Nigeria_GHS_W2_created_data}\geodata_2012.dta", replace
 
 use "${Uganda_GHS_W5_raw_data}\AGSEC3A.dta",clear 
 
-duplicates report hh plotID
+duplicates report HHID plotID
 
-merge 1:1 hh  plotID using "${Uganda_GHS_W5_raw_data}\AGSEC3B.dta", gen(fert)
+merge 1:1 HHID  plotID using "${Uganda_GHS_W5_raw_data}\AGSEC3B.dta", gen(fert)
 
-
-ren HHID hhi
-ren hh HHID
 
 
 
@@ -150,6 +150,13 @@ keep if ag_rainy_15==1
 *pp_s3q20c  	value commercial urea
 
 
+sum a3aq17, detail
+sum a3bq17, detail
+
+sum a3aq18, detail
+sum a3bq18, detail
+
+
 
 ***fertilzer total quantity, total value & total price****
 
@@ -169,8 +176,8 @@ tab tpricefert
 sum tpricefert, detail
 
 gen tpricefert_cens = tpricefert
-replace tpricefert_cens = 20000 if tpricefert_cens > 20000 & tpricefert_cens < . //winzorizing at bottom 10%
-*replace tpricefert_cens =66 if tpricefert_cens < 66
+replace tpricefert_cens = 30000 if tpricefert_cens > 30000 & tpricefert_cens < . //winzorizing at bottom 10%
+*replace tpricefert_cens =533 if tpricefert_cens < 533
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
 replace tpricefert_cens=0 if tpricefert_cens==.
@@ -181,6 +188,7 @@ gen tpricefert_cens_mrk = tpricefert_cens
 
 
 /*
+
 ************generating the median age**************
 
 
@@ -207,13 +215,13 @@ tab num_fert_pr_region
 
 gen tpricefert_cens_mrk = tpricefert_cens
 
-replace tpricefert_cens_mrk = medianfert_pr_ea_id if tpricefert_cens_mrk ==. & num_fert_pr_ea_id >= 11
+replace tpricefert_cens_mrk = medianfert_pr_ea_id if tpricefert_cens_mrk ==. & num_fert_pr_ea_id >= 8
 tab tpricefert_cens_mrk,missing
 
-replace tpricefert_cens_mrk = medianfert_pr_district if tpricefert_cens_mrk ==. & num_fert_pr_district >= 18
+replace tpricefert_cens_mrk = medianfert_pr_district if tpricefert_cens_mrk ==. & num_fert_pr_district >= 45
 tab tpricefert_cens_mrk ,missing
 
-replace tpricefert_cens_mrk = medianfert_pr_stratum if tpricefert_cens_mrk ==. & num_fert_pr_stratum >= 40
+replace tpricefert_cens_mrk = medianfert_pr_stratum if tpricefert_cens_mrk ==. & num_fert_pr_stratum >= 60
 tab tpricefert_cens_mrk ,missing
 
 replace tpricefert_cens_mrk = medianfert_pr_region if tpricefert_cens_mrk ==. 
@@ -257,7 +265,7 @@ tab total_qty, missing
 gen total_qty_w = total_qty
 tab total_qty_w
 replace total_qty_w= 0 if total_qty_w ==.
-replace total_qty_w= 300 if total_qty_w >300
+*replace total_qty_w= 300 if total_qty_w >300
 sum total_qty total_qty_w, detail
 
 
@@ -275,7 +283,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 
 */
 tab tpricefert_cens_mrk, missing
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk // / 0.9126678
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk / 0.7257617
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -333,18 +341,24 @@ keep if ag_rainy_15==1
  la var informal_save "=1 if used informal saving group"
 save "${Uganda_GHS_W5_created_data}\savings_2015.dta", replace
 
+*/
 
 
 *******************************************************
 *Credit access 
 *******************************************************
 
-use "${Uganda_GHS_W5_raw_data}/GSEC13A.dta", clear
+use "${Uganda_GHS_W5_raw_data}/gsec12_2.dta", clear
 
-*hh_s14q02_b types of formal fin institute used to borrow money
-*h13q20 bank 
-*h13q14 credit
+des
 
+ren hhid HHID
+*h12q9 Did you use credit
+*h12q10 where did you get the credit from
+tab h12q9 
+tab h12q9 , nolabel
+tab h12q10
+tab h12q10, nolabel
 
 
 
@@ -353,48 +367,31 @@ merge m:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter
 keep if ag_rainy_15==1
 
 
-tab h13q20, nolabel
-tab h13q14, nolabel
-
-ren h13q20 formal_bank
-tab formal_bank, missing
-replace formal_bank =0 if formal_bank ==2 | formal_bank ==.
-tab formal_bank, nolabel
-tab formal_bank,missing
-
-ren h13q14 credit
-tab credit, missing
-replace credit =0 if credit ==2 | credit ==.
-tab credit, nolabel
-tab credit,missing
 
 
 
-/*
-gen formal_credit =1 if hh_s14q02_b==7 |  hh_s14q02_b==8
+
+gen formal_credit =1 if h12q9==1  &  (h12q10 ==1 | h12q10 ==2 ) 
 tab formal_credit,missing
 replace formal_credit =0 if formal_credit ==.
 tab formal_credit,missing
 
-gen informal_credit = 1 if hh_s14q02_b==1 |  hh_s14q02_b==6 |hh_s14q02_b==2 |  hh_s14q02_b==3 |hh_s14q02_b==4 |  hh_s14q02_b==5  |hh_s14q02_b==9 |  hh_s14q02_b==10
+gen informal_credit = 1 if h12q9==1  &  (h12q10 ==3 | h12q10 ==4 | h12q10 ==7| h12q10 ==8 | h12q10 ==9 | h12q10 ==10 | h12q10 ==96) 
 tab informal_credit,missing
 replace informal_credit =0 if informal_credit ==.
 tab informal_credit,missing
 la var formal_credit "=1 if borrowed from formal credit group"
 la var informal_credit "=1 if borrowed from informal credit group"
-*/
 
 
 
 
-collapse (max) formal_bank credit , by (HHID)
 
- la var formal_bank "=1 if respondent have an account in bank"
-la var credit "=1 if borrowed from formal credit group"
+collapse (max) formal_credit informal_credit , by (HHID)
+
 save "${Uganda_GHS_W5_created_data}\credit_2015.dta", replace
 
 
-*/
 
 
 
@@ -409,10 +406,8 @@ save "${Uganda_GHS_W5_created_data}\credit_2015.dta", replace
 *Extension Visit 
 *******************************
 
-use "${Uganda_GHS_W5_raw_data}/AGSEC9.dta", clear
+use "${Uganda_GHS_W5_raw_data}/AGSEC9A.dta", clear
 
-ren HHID hhi
-ren hh HHID
 
 
 
@@ -552,19 +547,22 @@ save "${Uganda_GHS_W5_created_data}\market_distance.dta", replace
 *Demographics 
 *********************************
 
-use "${Uganda_GHS_W5_raw_data}\GSEC2.dta",clear 
+use "${Uganda_GHS_W5_raw_data}\gsec2.dta",clear 
 
 
 
-merge 1:1 HHID PID using "${Uganda_GHS_W5_raw_data}\GSEC4.dta", gen(household) force
+merge 1:1 hhid pid using "${Uganda_GHS_W5_raw_data}\gsec4.dta", gen(household) 
 
+
+ren hhid HHID
+ren pid PID
 des
 
 
 merge m:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter)
 
 keep if ag_rainy_15==1
-
+keep if filter==3
 
 
 *h2q3   sex
@@ -574,6 +572,7 @@ keep if ag_rainy_15==1
 tab h2q3
 tab h2q3, nolabel
 tab h2q4
+tab h2q4, nolabel
 sum h2q8, detail
  
 gen num_mem = 1
@@ -620,18 +619,18 @@ tab num_hh_region
 
 
 
-replace hh_headage = medianhh_pr_ea if hh_headage ==. & num_hh_ea >= 22
+replace hh_headage = medianhh_pr_ea if hh_headage ==. & num_hh_ea >= 21
 
 tab hh_headage,missing
 
 
-replace hh_headage = medianhh_pr_district if hh_headage ==. & num_hh_district >= 70
+replace hh_headage = medianhh_pr_district if hh_headage ==. & num_hh_district >= 384
 
 tab hh_headage,missing
 
 
 
-replace hh_headage = medianhh_pr_stratum if hh_headage ==. & num_hh_stratum >= 366
+replace hh_headage = medianhh_pr_stratum if hh_headage ==. & num_hh_stratum >= 1195
 
 tab hh_headage,missing
 
@@ -746,6 +745,11 @@ save "${Uganda_GHS_W5_created_data}\demographics_2015.dta", replace
 use "${Uganda_GHS_W5_raw_data}\GSEC2.dta",clear 
 
 
+
+ren hhid HHID
+ren pid PID
+
+
 merge m:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter)
 
 keep if ag_rainy_15==1
@@ -772,7 +776,7 @@ save "${Uganda_GHS_W5_created_data}\labor_age_2015.dta", replace
 *Safety Net
 ********************************
 
-use "${Uganda_GHS_W5_raw_data}\GSEC11A.dta",clear 
+use "${Uganda_GHS_W5_raw_data}\gsec11_2.dta",clear 
 GSEC11B
 
 merge m:1 hhid using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter)
@@ -908,7 +912,7 @@ save "${Uganda_GHS_W5_created_data}\food_prices.dta", replace
 **************
 *Net Buyers and Sellers
 ***************
-use "${Uganda_GHS_W5_raw_data}/GSEC15.dta", clear
+use "${Uganda_GHS_W5_raw_data}/gsec15b.dta", clear
 use "${Uganda_GHS_W5_raw_data}/GSEC15C.dta", clear
 
 GSEC15D.
@@ -1047,9 +1051,9 @@ save "${Uganda_GHS_W5_created_data}\food_prices_2015.dta", replace
 
 
 *Total Value
-use "${Uganda_GHS_W5_raw_data}\GSEC14A.dta",clear  
+use "${Uganda_GHS_W5_raw_data}\gsec14.dta",clear  
 
-
+ren hhid HHID
 *"${Uganda_GHS_W4_raw_data}\GSEC14B.dta"
 *h14q4   = number of household asset owned
 *h14q5   = total estimated value of the asset
@@ -1097,7 +1101,7 @@ tab hhasset_value_w, missing
 sum hhasset_value hhasset_value_w, detail
 
 
-gen real_hhvalue = hhasset_value_w  // / 0.9126678
+gen real_hhvalue = hhasset_value_w  / 0.7257617
 sum hhasset_value_w real_hhvalue, detail
 
 
@@ -1132,9 +1136,6 @@ duplicates report HHID parcelID
 
 
 *merge 1:1 HHID parcelID using "${Uganda_GHS_W5_raw_data}/AGSEC2B.dta"
-
-ren HHID hhi
-ren hh HHID
 
 
 des
@@ -1211,24 +1212,20 @@ save "${Uganda_GHS_W5_created_data}\land_holding_2015.dta", replace
 
 
 
-
-use "${Uganda_GHS_W4_raw_data}/AGSEC2A.dta", clear
+use "${Uganda_GHS_W5_raw_data}/AGSEC2A.dta", clear
 
 duplicates report HHID parcelID
 
 
-*merge 1:1 HHID parcelID using "${Uganda_GHS_W4_raw_data}/AGSEC2B.dta"
-
-ren HHID hhi
-ren hh HHID
+*merge 1:1 HHID parcelID using "${Uganda_GHS_W5_raw_data}/AGSEC2B.dta"
 
 
 des
 
 
-merge m:1 HHID using "${Uganda_GHS_W4_created_data}/ag_rainy_13.dta", gen(filter)
+merge m:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter)
 
-keep if ag_rainy_13==1
+keep if ag_rainy_15==1
 
 *a2aq4  size of parcel using GPS
 *a2aq5 Size of parcel using farmer estimation
@@ -1271,8 +1268,6 @@ save "${Uganda_GHS_W5_created_data}/parcelID.dta", replace
 
 use "${Uganda_GHS_W5_raw_data}/AGSEC2A.dta", replace
 
-ren HHID hhi
-ren hh HHID
 
 sort HHID parcelID
 duplicates report HHID parcelID
@@ -1324,14 +1319,14 @@ tab num_region
 
 
 
-replace soil_quality= median_soil_ea if soil_quality==.  & num_ea >= 39
+replace soil_quality= median_soil_ea if soil_quality==.  & num_ea >= 40
 tab soil_quality, missing
 
-replace soil_quality= median_soil_district if soil_quality==.  & num_district >= 145
+replace soil_quality= median_soil_district if soil_quality==.  & num_district >= 673
 tab soil_quality, missing
 
 
-replace soil_quality= median_soil_stratum if soil_quality==.  & num_stratum >= 676
+replace soil_quality= median_soil_stratum if soil_quality==.  & num_stratum >= 1982
 tab soil_quality, missing
 
 
@@ -1454,69 +1449,69 @@ save "${Uganda_GHS_W5_created_data}\soil_quality_2015.dta", replace
 
 ************************* Merging Agricultural Datasets ********************
 
-use "${Uganda_GHS_W4_created_data}\purchased_fert_2013.dta", replace
+use "${Uganda_GHS_W5_created_data}\purchased_fert_2015.dta", replace
 
 
 *******All observations Merged*****
 
 
-*merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\market_distance.dta"
-*drop _merge
-*sort HHID
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\market_distance.dta"
+drop _merge
+sort HHID
 
 
-*merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\savings_2013.dta"
+*merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\savings_2015.dta"
 *drop _merge
 sort HHID
-*merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\credit_2013.dta"
-*drop _merge
-sort HHID
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\extension_visit_2013.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\credit_2015.dta"
 drop _merge
 sort HHID
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\demographics_2013.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\extension_visit_2015.dta"
 drop _merge
 sort HHID
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\labor_age_2013.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\demographics_2015.dta"
 drop _merge
 sort HHID
-*merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\safety_net_2013.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\labor_age_2015.dta"
+drop _merge
+sort HHID
+*merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\safety_net_2015.dta"
 *drop _merge
 sort HHID
-*merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\food_prices_2013.dta"
-*drop _merge
-*sort HHID
-*merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\geodata_2013.dta"
+*merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\food_prices_2015.dta"
 *drop _merge
 *sort HHID
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\soil_quality_2013.dta"
+*merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\geodata_2015.dta"
+*drop _merge
+*sort HHID
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\soil_quality_2015.dta"
 drop _merge
 sort HHID
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\asset_value_2013.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\asset_value_2015.dta"
 drop _merge
 sort HHID
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}\land_holding_2013.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\land_holding_2015.dta"
 drop _merge
 sort HHID
 
  
-merge 1:1 HHID using "${Uganda_GHS_W4_created_data}/ag_rainy_13.dta"
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta"
 drop _merge
  
-keep if ag_rainy_13==1
+keep if ag_rainy_15==1
 sort HHID
-gen year = 2013
+gen year = 2015
 
 
 
 
-tabstat total_qty_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 *real_maize_price_mr real_rice_price_mr  pry_edu finish_pry finish_sec net_seller net_buyer safety_net
 
 
 
-misstable summarize femhead  ext_acess attend_sch    total_qty_w  real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
 
 *credit formal_save informal_save
 *proportion femhead credit formal_save informal_save ext_acess attend_sch  safety_net  soil_qty_rev2
@@ -1526,8 +1521,8 @@ misstable summarize femhead  ext_acess attend_sch    total_qty_w  real_tpricefer
 *egen median_mrk = median(mrk_dist_w)
 *replace mrk_dist_w= median_mrk if mrk_dist_w==.
 
-egen median_price = median(real_tpricefert_cens_mrk)
-replace real_tpricefert_cens_mrk= median_price if real_tpricefert_cens_mrk==.
+*egen median_price = median(real_tpricefert_cens_mrk)
+*replace real_tpricefert_cens_mrk= median_price if real_tpricefert_cens_mrk==.
 
 *egen median_age = median(hh_headage)
 *replace hh_headage= median_age if hh_headage==.
@@ -1536,52 +1531,20 @@ replace real_tpricefert_cens_mrk= median_price if real_tpricefert_cens_mrk==.
 egen median_qty = median(total_qty_w)
 replace total_qty_w= median_qty if total_qty_w==.
 
-misstable summarize femhead  ext_acess attend_sch    total_qty_w  real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+misstable summarize femhead  ext_acess attend_sch    total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
 
 *credit formal_save informal_save safety_net
 sum total_qty_w, detail
+sum real_tpricefert_cens_mrk, detail
 
-
-ren HHID_old hhis
-
-tostring hhis , generate(HHID_old) force
-
-format HHID_old %13s
- 
-
-duplicates report HHID_old
-
-duplicates drop HHID_old, force
-save "${Uganda_GHS_W4_created_data}\Uganda_wave4_complete_data.dta", replace
-
-
-use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave3\market_distance.dta", replace
-
-
-
-ren HHID HHID_old
-
-duplicates report HHID_old
- merge 1:1 HHID_old using "${Uganda_GHS_W4_created_data}\Uganda_wave4_complete_data.dta", gen (mrk)
- 
-keep if mrk==3
- tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
- misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
-
-
-egen median_mrk = median(mrk_dist_w)
-replace mrk_dist_w= median_mrk if mrk_dist_w==.
-
-ren HHID spec
-ren HHID_old HHID
-
-save "${Uganda_GHS_W4_created_data}\Uganda_wave44_complete_data.dta", replace
+save "${Uganda_GHS_W5_created_data}\Uganda_wave5_complete_data.dta", replace
 
 
 
 
 
+
+/*
 
 
 

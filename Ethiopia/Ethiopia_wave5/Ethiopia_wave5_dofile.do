@@ -143,15 +143,15 @@ sum tpricefert, detail
 
 
 gen tpricefert_cens = tpricefert
-*replace tpricefert_cens = 66.6 if tpricefert_cens > 66.6 & tpricefert_cens < . //winzorizing at bottom 1%
-*replace tpricefert_cens = 1.8 if tpricefert_cens < 1.8
+replace tpricefert_cens = 80 if tpricefert_cens > 80 & tpricefert_cens < . //winzorizing at bottom 1%
+replace tpricefert_cens = 1 if tpricefert_cens < 1
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
-replace tpricefert_cens=0 if tpricefert_cens==.
-tab tpricefert_cens, missing 
+*replace tpricefert_cens= 0 if tpricefert_cens==.
+*tab tpricefert_cens, missing 
 
-sum tpricefert_cens, detail
-gen tpricefert_cens_mrk = tpricefert_cens
+*sum tpricefert_cens, detail
+*gen tpricefert_cens_mrk = tpricefert_cens
 
 
 
@@ -168,7 +168,7 @@ gen zones = real(regexr(saq02, "[^0-9.]", ""))
 
 ren saq01 region
 
-/*
+
 
 egen medianfert_pr_ea = median(tpricefert_cens), by (ea)
 egen num_fert_pr_ea = count(tpricefert_cens), by (ea)
@@ -1393,7 +1393,7 @@ misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  
 
 
 
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\completed21.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_median21.dta", replace
 
 
 

@@ -1,6 +1,9 @@
 
 
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\completed21.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_heckman21.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_median21.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\completed21.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\completed21.dta", clear
 
 
 sort hhid year
@@ -14,14 +17,21 @@ tab dummy
 keep if dummy==2
 sort hhid
 
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_completed21.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Real_price_heckman21.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Real_price_median21.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Real_price_heckman21.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Real_price_heckman21.dta", replace
 
 
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\completed21.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_heckman21.dta"
+merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_median21.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_heckman21.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price_heckman21.dta"
+
 
 drop if _merge==2
 sort hhid year
-
+order hhid year
 
 
 
@@ -45,7 +55,7 @@ foreach x in `time_avg' {
 }
 
 
-heckman real_tpricefert_cens_mrk  land_holding ext_acess attend_sch formal_credit informal_credit i.zones  i.year, select (commercial_dummy= mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 i.zone  i.year) twostep
+heckman real_tpricefert_cens_mrk  land_holding ext_acess attend_sch formal_credit informal_credit i.zones  i.year, select (commercial_dummy= mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 i.region  i.year) twostep
 
 
 predict yhat, xb
@@ -70,18 +80,20 @@ foreach x in `time_avg' {
 }
 
 ** CRE-TOBIT 
-tobit total_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 i.zones i.year, ll(0)
+tobit total_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 i.region i.year, ll(0)
 
 margins, predict(ystar(0,.)) dydx(*) post
 
+tabstat total_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 ** CRE-TOBIT 
-tobit total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_total_qty_w TAvg_mrk_dist_w TAvg_real_tpricefert_cens_mrk TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 i.zones i.year, ll(0)
+tobit total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_total_qty_w TAvg_mrk_dist_w TAvg_real_tpricefert_cens_mrk TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 i.region i.year, ll(0)
 
 margins, predict(ystar(0,.)) dydx(*) post
 
 
+tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 

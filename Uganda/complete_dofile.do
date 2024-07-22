@@ -2,10 +2,10 @@
 
 *use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman.dta", clear
 
-*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman.dta", clear
 
 
-use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_median.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_median.dta", clear
 
 *use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman.dta", clear
 
@@ -22,15 +22,15 @@ keep if dummy==3
 sort HHID
 
 *save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Real_Price_heckman.dta", replace
-*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Nominal_Price_heckman.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Real_Price_median.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Nominal_Price_heckman.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Real_Price_median.dta", replace
 *save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Real_Price_heckman.dta", replace
 
 
 *merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman.dta"
-*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman.dta"
+merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman.dta"
 
-merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_median.dta"
+*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_median.dta"
 *merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman.dta"
 
 
@@ -336,7 +336,7 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_
 
 
 restore
-/*
+
 
 ************************************
 *cpi
@@ -363,11 +363,11 @@ drop yr1960-yr1989
 l countrycode yr2004-yr2017
 
 *rebase to 2015
-gen baseyear = yr2013
-forvalues i=1990(1)2013 {
+gen baseyear = yr2018
+forvalues i=1990(1)2018 {
 	replace yr`i' = yr`i'/baseyear
 }
-forvalues i=1990(1)2013 {
+forvalues i=1990(1)2018 {
 	di "year is: `i'" 
 }
 
@@ -378,7 +378,7 @@ rename yr cpi
 keep countrycode countryname year cpi
 order countrycode countryname year cpi
 la var year "Year"
-la var cpi "CPI (base=2013)"
+la var cpi "CPI (base=2018)"
 
 
 *save for use in analysis

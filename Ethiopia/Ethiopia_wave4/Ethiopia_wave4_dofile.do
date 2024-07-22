@@ -124,14 +124,14 @@ sum tpricefert, detail
 
 gen tpricefert_cens = tpricefert
 replace tpricefert_cens = 766.6 if tpricefert_cens > 766.6 & tpricefert_cens < . //winzorizing at bottom 1%
-*replace tpricefert_cens = 3 if tpricefert_cens < 3
+replace tpricefert_cens = 3 if tpricefert_cens < 3
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
-replace tpricefert_cens=0 if tpricefert_cens==.
-tab tpricefert_cens, missing 
+*replace tpricefert_cens=0 if tpricefert_cens==.
+*tab tpricefert_cens, missing 
 
-sum tpricefert_cens, detail
-gen tpricefert_cens_mrk = tpricefert_cens
+*sum tpricefert_cens, detail
+*gen tpricefert_cens_mrk = tpricefert_cens
 
 
 ************generating the median age**************
@@ -147,7 +147,7 @@ gen zones = real(regexr(saq02, "[^0-9.]", ""))
 
 ren saq01 region
 
-/*
+
 
 egen medianfert_pr_ea = median(tpricefert_cens), by (ea)
 egen num_fert_pr_ea = count(tpricefert_cens), by (ea)
@@ -241,7 +241,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 */
 tab tpricefert_cens_mrk, missing
 sum tpricefert_cens_mrk, detail
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   // 0.5656291
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   / 0.5656291
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -979,7 +979,7 @@ tab hhasset_value_w, missing
 sum hhasset_value hhasset_value_w, detail
 
 
-gen real_hhvalue = hhasset_value_w   // 0.5656291
+gen real_hhvalue = hhasset_value_w   / 0.5656291
 sum hhasset_value_w real_hhvalue, detail
 
 

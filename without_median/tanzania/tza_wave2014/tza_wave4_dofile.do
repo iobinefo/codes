@@ -204,11 +204,11 @@ ren y4_hhid HHID
 collapse  (max) maize_price_mr rice_price_mr, by(HHID)
 
 
-gen rea_maize_price_mr = maize_price_mr/0.7730376
+gen rea_maize_price_mr = maize_price_mr   //0.7730376
 gen real_maize_price_mr = rea_maize_price_mr
 tab real_maize_price_mr
 sum real_maize_price_mr, detail
-gen rea_rice_price_mr = rice_price_mr/0.7730376
+gen rea_rice_price_mr = rice_price_mr    //0.7730376
 gen real_rice_price_mr = rea_rice_price_mr
 tab real_rice_price_mr
 sum real_rice_price_mr, detail
@@ -621,7 +621,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 }
 tab tpricefert_cens_mrk
 sum tpricefert_cens_mrk tpricefert_cens_mrk_w, detail
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk_w/0.7730376
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk_w   //0.7730376
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk, missing
 sum tpricefert_cens_mrk_w real_tpricefert_cens_mrk, detail
@@ -1032,7 +1032,7 @@ sum hhasset_value hhasset_value_w, detail
 
 replace hhasset_value_w =0 if hhasset_value_w==.
 
-gen rea_hhvalue = hhasset_value_w/0.7730376
+gen rea_hhvalue = hhasset_value_w   //0.7730376
 gen real_hhvalue = rea_hhvalue/1000
 sum hhasset_value_w real_hhvalue, detail
 

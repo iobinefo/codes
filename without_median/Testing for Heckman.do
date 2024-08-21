@@ -1,4 +1,11 @@
-use "C:\Users\obine\Music\Documents\Project\codes\without_median\complete_files.dta", clear
+
+
+
+
+
+*use "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckman.dta", clear
+
+use "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckman.dta", clear
 
 
 gen dummy = 1
@@ -8,14 +15,17 @@ tab dummy
 keep if dummy==4
 sort hhid
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_complete_files", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_Real_heckman", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_Nominal_heckman", replace
 
 
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete_files.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckman.dta"
+merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckman.dta"
 
 drop if _merge==2
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete_files1.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckman.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckman.dta", replace
 
 
 gen year_2010 = (year==2010)
@@ -29,107 +39,33 @@ tab commercial_dummy
 
 
 tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
 
+sum real_tpricefert_cens_mrk, detail
 
-/*
-For maize farmers only
 
 
-use "C:\Users\obine\Music\Documents\Project\codes\complete_file.dta", clear
-gen dummy = 1
 
-collapse (sum) dummy, by (hhid)
-tab dummy
-keep if dummy==4
-sort hhid
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckman.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckman.dta", replace
 
-save "C:\Users\obine\Music\Documents\Project\codes\subset_complete_file", replace
 
 
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\complete_file.dta"
 
-drop if _merge==2
 
+*use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckman.dta", clear
+use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckman.dta", clear
 
 
 
-gen year_2010 = (year==2010)
-gen year_2012 = (year==2012)
-gen year_2015 = (year==2015)
-gen year_2018 = (year==2018)
 
-gen commercial_dummy = (total_qty_w>0)
 
 
+tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
-
-
-
-
-
-
-
-
-** OLS **
-reg real_tpricefert_cens_mrk subsidy_qty_w mrk_dist_w num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 i.zone i.year
-
-
-gen ltotal_qty_w = log(total_qty_w)
-
-
-
-
-gen lprice_Paid = log(real_tpricefert_cens_mrk)
-
-
-
-local time_avg "total_qty_w subsidy_qty_w mrk_dist_w lprice_Paid num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2"
-
-foreach x in `time_avg' {
-
-	bysort hhid : egen TAvg_`x' = mean(`x')
-
-}
-
-heckman lprice_Paid subsidy_qty_w  mrk_dist_w real_maize_price_mr real_rice_price_mr  land_holding ext_acess attend_sch i.zone  i.year, select (commercial_dummy= subsidy_qty_w mrk_dist_w num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 i.zone  i.year) twostep
-
-
-predict yhat, xb
-
-
-tab yhat, missing
-
-*gen lyhat = log(yhat)
-
-
-local time_avg "yhat"
-
-foreach x in `time_avg' {
-
-	bysort hhid : egen TAvg_`x' = mean(`x')
-
-}
-
-** CRE-TOBIT 
-tobit total_qty_w subsidy_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 TAvg_total_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_femhead TAvg_informal_save TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_pry_edu TAvg_finish_pry TAvg_finish_sec TAvg_safety_net TAvg_net_seller TAvg_net_buyer TAvg_soil_qty_rev2 i.zone i.year, ll(0)
-
-margins, predict(ystar(0,.)) dydx(*) post
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
+sum real_tpricefert_cens_mrk, detail
 
 
 local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2"
@@ -152,8 +88,6 @@ tab yhat, missing
 sum yhat [aw= weight], detail
 
 
-tabstat total_qty_w subsidy_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
 
 *gen lyhat = log(yhat)
 
@@ -171,6 +105,7 @@ tobit total_qty_w yhat subsidy_qty_w mrk_dist_w num_mem hh_headage real_hhvalue 
 
 margins, predict(ystar(0,.)) dydx(*) post
 
+tabstat total_qty_w subsidy_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 */

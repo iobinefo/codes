@@ -1574,7 +1574,7 @@ misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mr
 
 
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median/complete_files", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median/Nominal_heckman", replace
 
 
 

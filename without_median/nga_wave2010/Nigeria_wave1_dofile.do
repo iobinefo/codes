@@ -339,7 +339,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 
 */
 *
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk/0.4164266
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   //0.4164266
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -945,11 +945,11 @@ collapse  (max) maize_price_mr rice_price_mr net_seller net_buyer, by(hhid)
 
 
 
-gen rea_maize_price_mr = maize_price_mr/0.4164266
+gen rea_maize_price_mr = maize_price_mr  //0.4164266
 gen real_maize_price_mr = rea_maize_price_mr
 tab real_maize_price_mr
 sum real_maize_price_mr, detail
-gen rea_rice_price_mr = rice_price_mr/0.4164266
+gen rea_rice_price_mr = rice_price_mr   //0.4164266
 gen real_rice_price_mr = rea_rice_price_mr
 tab real_rice_price_mr
 sum real_rice_price_mr, detail
@@ -1106,7 +1106,7 @@ sum hhasset_value hhasset_value_w, detail
 
 *summarize  hhasset_value_w hhasset_value_s , detail
 
-gen rea_hhvalue = hhasset_value_w/0.4164266
+gen rea_hhvalue = hhasset_value_w   //0.4164266
 gen real_hhvalue = rea_hhvalue/1000
 sum hhasset_value_w real_hhvalue, detail
 

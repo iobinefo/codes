@@ -88,6 +88,11 @@ merge m:1 hhid using "${Ethiopia_GHS_W3_created_data}/ag_rainy_15.dta", gen(filt
 keep if ag_rainy_15==1
 
 
+ren saq05 ea
+ren saq03 woreda
+ren saq02 zones
+ren saq01 region
+
 *pp_s3q16c  	qty commercial urea
 *pp_s3q16d 		value commercial urea
 
@@ -114,22 +119,21 @@ tab tpricefert
 gen tpricefert_cens = tpricefert
 replace tpricefert_cens = 674.7 if tpricefert_cens > 674.7 & tpricefert_cens < . //winzorizing at bottom 1%
 replace tpricefert_cens = 2 if tpricefert_cens < 2
-tab tpricefert_cens, missing  //winzorizing at top 1%
+*tab tpricefert_cens, missing  //winzorizing at top 1%
 sum tpricefert_cens, detail
 
-/*
+
 replace tpricefert_cens=0 if tpricefert_cens==.
 tab tpricefert_cens, missing 
 
 sum tpricefert_cens, detail
 gen tpricefert_cens_mrk = tpricefert_cens
-*/
+
+
+/*
 ************generating the median age**************
 
-ren saq05 ea
-ren saq03 woreda
-ren saq02 zones
-ren saq01 region
+
 
 
 
@@ -668,108 +672,227 @@ tab safety_net
 la var safety_net "=1 if received cash transfer, cash for work, food for work or other assistance"
 save "${Ethiopia_GHS_W3_created_data}\safety_net_2015.dta", replace
 
-/*
+
+
+
+
+
+
+
 **************************************
 *Food Prices
 **************************************
-use "${Nigeria_GHS_W3_raw_data}\Post Harvest Wave 2\Community\sectc8_harvestw2.dta", clear
+use "${Ethiopia_GHS_W3_raw_data}\Community\sect10a2_com_w3.dta", clear
 
 
 
-gen maize_price=c8q2 if item_cd==3
+tab cs10a2q02 if cs10a2q02==4
+tab cs10a2q02 if cs10a2q02==5
+
+
+tab cs10a2q03_a if cs10a2q02==4 //maize
+tab cs10a2q03_a if cs10a2q02==4, nolabel
+tab cs10a2q03_a if cs10a2q02==5  //sorghum
+tab cs10a2q03_a if cs10a2q02==5, nolabel
+
+
+sum cs10a2q05 if cs10a2q02==4, detail
+
+
+
+
+
+
+
+
+gen maize_price=cs10a2q05  if  cs10a2q02==4 & cs10a2q03_a==1
+*replace maize_price=cs10a2q05 /1000 if cs10a2q02==4 & cs10a2q03_a==1
+
+*br maize_price cs10a2q05 cs10a2q03_a cs10a2q02 if cs10a2q02==4 
+
+*/
+
+
 tab maize_price,missing
 sum maize_price,detail
 tab maize_price
 
-replace maize_price = 900 if maize_price >900 & maize_price<.  //bottom 2%
+replace maize_price = 600 if maize_price >600 & maize_price<.  //bottom 2%
 *replace maize_price = 10 if maize_price< 10        ////top 5%
 
 
-
-egen median_pr_ea = median(maize_price), by (ea)
-egen median_pr_lga = median(maize_price), by (lga)
-egen median_pr_state = median(maize_price), by (state)
-egen median_pr_zone = median(maize_price), by (zone)
-
-egen num_pr_ea = count(maize_price), by (ea)
-egen num_pr_lga = count(maize_price), by (lga)
-egen num_pr_state = count(maize_price), by (state)
-egen num_pr_zone = count(maize_price), by (zone)
-
-tab num_pr_ea
-tab num_pr_lga
-tab num_pr_state
-tab num_pr_zone
+************generating the median age**************
 
 
-gen maize_price_mr = maize_price
+egen median_maize = median(maize_price)
 
-replace maize_price_mr = median_pr_ea if maize_price_mr==. & num_pr_ea>=2
-tab maize_price_mr,missing
 
-replace maize_price_mr = median_pr_lga if maize_price_mr==. & num_pr_lga>=2
-tab maize_price_mr,missing
 
-replace maize_price_mr = median_pr_state if maize_price_mr==. & num_pr_state>=2
-tab maize_price_mr,missing
+list ea_id2 if real(ea_id2) == .
+gen ea = real(regexr(ea_id2, "[^0-9.]", ""))
 
-replace maize_price_mr = median_pr_zone if maize_price_mr==. & num_pr_zone>=2
-tab maize_price_mr,missing
+ren sa1q03  woreda
+ren sa1q02 zones
+ren sa1q01 region
+
+
+
+egen medianhh_pr_ea = median(maize_price), by (ea)
+egen num_hh_pr_ea = count(maize_price), by (ea)
+
+
+egen medianhh_pr_woreda = median(maize_price), by (woreda)
+egen num_hh_pr_woreda = count(maize_price), by (woreda)
+
+egen medianhh_pr_zone = median(maize_price), by (zone)
+egen num_hh_pr_zone = count(maize_price), by (zone)
+
+egen medianhh_pr_region = median(maize_price), by (region)
+egen num_hh_pr_region = count(maize_price), by (region)
+
+
+tab medianhh_pr_ea
+tab medianhh_pr_woreda
+tab medianhh_pr_zone
+tab medianhh_pr_region
+
+
+
+tab num_hh_pr_ea
+tab num_hh_pr_woreda
+tab num_hh_pr_zone
+tab num_hh_pr_region
+
+
+
+replace maize_price = medianhh_pr_ea if maize_price ==. & num_hh_pr_ea >= 3
+
+tab maize_price,missing
+
+
+replace maize_price = medianhh_pr_woreda if maize_price ==. & num_hh_pr_woreda >= 32
+
+tab maize_price,missing
+
+
+
+replace maize_price = medianhh_pr_zone if maize_price ==. & num_hh_pr_zone >= 22
+
+tab maize_price,missing
+
+
+replace maize_price = medianhh_pr_region if maize_price ==. 
+
+tab maize_price,missing
+
+sum maize_price, detail
+replace maize_price = median_maize if maize_price ==. 
+
+tab maize_price,missing
+
+sum maize_price, detail
+
 
 
 
 ****************
 *rice price
 ***************
+tab cs10a2q03_a if cs10a2q02==5  //sorghum
+tab cs10a2q03_a if cs10a2q02==5, nolabel
 
 
-gen rice_price=c8q2 if item_cd==7
+sum cs10a2q05 if cs10a2q02==5, detail
+
+
+
+
+
+
+
+
+gen rice_price=cs10a2q05  if  cs10a2q02==5 & cs10a2q03_a==1
+
+*/
+
+
 tab rice_price,missing
 sum rice_price,detail
 tab rice_price
 
-replace rice_price = 750 if rice_price >750 & rice_price<.   //bottom 2%
-*replace rice_price = 25 if rice_price< 25   //top 3%
+replace rice_price = 900 if rice_price >900 & rice_price<.  //bottom 2%
+*replace rice_price = 10 if rice_price< 10        ////top 5%
+
+
+************generating the median age**************
+egen median_rice = median(rice_price)
+
+egen medianri_pr_ea = median(rice_price), by (ea)
+egen num_ri_pr_ea = count(rice_price), by (ea)
+
+
+egen medianri_pr_woreda = median(rice_price), by (woreda)
+egen num_ri_pr_woreda = count(rice_price), by (woreda)
+
+egen medianri_pr_zone = median(rice_price), by (zone)
+egen num_ri_pr_zone = count(rice_price), by (zone)
+
+egen medianri_pr_region = median(rice_price), by (region)
+egen num_ri_pr_region = count(rice_price), by (region)
+
+
+tab medianri_pr_ea
+tab medianri_pr_woreda
+tab medianri_pr_zone
+tab medianri_pr_region
+
+
+
+tab num_ri_pr_ea
+tab num_ri_pr_woreda
+tab num_ri_pr_zone
+tab num_ri_pr_region
+
+
+
+replace rice_price = medianri_pr_ea if rice_price ==. & num_ri_pr_ea >= 9
+
+tab rice_price,missing
+
+
+replace rice_price = medianri_pr_woreda if rice_price ==. & num_ri_pr_woreda >= 25
+
 tab rice_price,missing
 
 
 
-egen median_rice_ea = median(rice_price), by (ea)
-egen median_rice_lga = median(rice_price), by (lga)
-egen median_rice_state = median(rice_price), by (state)
-egen median_rice_zone = median(rice_price), by (zone)
+replace rice_price = medianri_pr_zone if rice_price ==. & num_ri_pr_zone >= 19
 
-egen num_rice_ea = count(rice_price), by (ea)
-egen num_rice_lga = count(rice_price), by (lga)
-egen num_rice_state = count(rice_price), by (state)
-egen num_rice_zone = count(rice_price), by (zone)
-
-tab num_rice_ea
-tab num_rice_lga
-tab num_rice_state
-tab num_rice_zone
+tab rice_price,missing
 
 
-gen rice_price_mr = rice_price
+replace rice_price = medianri_pr_region if rice_price ==. 
 
-replace rice_price_mr = median_rice_ea if rice_price_mr==. & num_rice_ea>=2
-tab rice_price_mr,missing
-
-replace rice_price_mr = median_rice_lga if rice_price_mr==. & num_rice_lga>=2
-tab rice_price_mr,missing
-
-replace rice_price_mr = median_rice_state if rice_price_mr==. & num_rice_state>=2
-tab rice_price_mr,missing
-
-replace rice_price_mr = median_rice_zone if rice_price_mr==. & num_rice_zone>=2
-tab rice_price_mr,missing
+tab rice_price,missing
 
 
-sort zone state ea
-collapse (max) maize_price_mr rice_price_mr , by (zone state lga sector ea)
+
+replace rice_price = median_rice if rice_price ==. 
+
+tab rice_price,missing
+
+sum rice_price, detail
 
 
-save "${Nigeria_GHS_W3_created_data}\food_prices.dta", replace
+
+
+duplicates report  region zone woreda ea
+sort region zone woreda ea
+collapse (max) maize_price rice_price , by (region zone woreda ea)
+
+
+save "${Ethiopia_GHS_W3_created_data}\food_prices.dta", replace
+
 
 
 
@@ -779,7 +902,19 @@ save "${Nigeria_GHS_W3_created_data}\food_prices.dta", replace
 ***************
 use "${Ethiopia_GHS_W3_raw_data}\Household\sect5a_hh_w3.dta", clear
 
-merge m:1 zone state lga sector ea using "${Nigeria_GHS_W2_created_data}\food_prices.dta", keepusing ( maize_price_mr rice_price_mr)
+
+
+list ea_id2 if real(ea_id2) == .
+gen ea = real(regexr(ea_id2, "[^0-9.]", ""))
+ren saq03 woreda
+ren saq02 zones
+ren saq01 region
+
+
+merge m:1 region zone woreda ea using  "${Ethiopia_GHS_W3_created_data}\food_prices.dta", keepusing ( maize_price rice_price)
+
+
+
 
 ren household_id2 hhid
 merge m:1 hhid using "${Ethiopia_GHS_W3_created_data}/ag_rainy_15.dta", gen(filter)
@@ -791,34 +926,63 @@ keep if ag_rainy_15==1
 **********
 *maize
 *********
-egen median_pr_ea = median(maize_price), by (ea)
-egen median_pr_lga = median(maize_price), by (lga)
-egen median_pr_state = median(maize_price), by (state)
-egen median_pr_zone = median(maize_price), by (zone)
 
-egen num_pr_ea = count(maize_price), by (ea)
-egen num_pr_lga = count(maize_price), by (lga)
-egen num_pr_state = count(maize_price), by (state)
-egen num_pr_zone = count(maize_price), by (zone)
+egen median_maize = median(maize_price)
 
-tab num_pr_ea
-tab num_pr_lga
-tab num_pr_state
-tab num_pr_zone
+egen medianhh_pr_ea = median(maize_price), by (ea)
+egen num_hh_pr_ea = count(maize_price), by (ea)
 
 
+egen medianhh_pr_woreda = median(maize_price), by (woreda)
+egen num_hh_pr_woreda = count(maize_price), by (woreda)
 
-replace maize_price_mr = median_pr_ea if maize_price_mr==. & num_pr_ea>=2
-tab maize_price_mr,missing
+egen medianhh_pr_zone = median(maize_price), by (zone)
+egen num_hh_pr_zone = count(maize_price), by (zone)
 
-replace maize_price_mr = median_pr_lga if maize_price_mr==. & num_pr_lga>=2
-tab maize_price_mr,missing
+egen medianhh_pr_region = median(maize_price), by (region)
+egen num_hh_pr_region = count(maize_price), by (region)
 
-replace maize_price_mr = median_pr_state if maize_price_mr==. & num_pr_state>=2
-tab maize_price_mr,missing
 
-replace maize_price_mr = median_pr_zone if maize_price_mr==. & num_pr_zone>=2
-tab maize_price_mr,missing
+tab medianhh_pr_ea
+tab medianhh_pr_woreda
+tab medianhh_pr_zone
+tab medianhh_pr_region
+
+
+
+tab num_hh_pr_ea
+tab num_hh_pr_woreda
+tab num_hh_pr_zone
+tab num_hh_pr_region
+
+
+
+replace maize_price = medianhh_pr_ea if maize_price ==. & num_hh_pr_ea >= 6
+
+tab maize_price,missing
+
+
+replace maize_price = medianhh_pr_woreda if maize_price ==. & num_hh_pr_woreda >= 25
+
+tab maize_price,missing
+
+
+
+replace maize_price = medianhh_pr_zone if maize_price ==. & num_hh_pr_zone >= 26
+
+tab maize_price,missing
+
+
+replace maize_price = medianhh_pr_region if maize_price ==. 
+
+tab maize_price,missing
+
+sum maize_price, detail
+replace maize_price = median_maize if maize_price ==. 
+
+tab maize_price,missing
+
+sum maize_price, detail
 
 
 ****************
@@ -826,35 +990,68 @@ tab maize_price_mr,missing
 ***************
 
 
-egen median_rice_ea = median(rice_price), by (ea)
-egen median_rice_lga = median(rice_price), by (lga)
-egen median_rice_state = median(rice_price), by (state)
-egen median_rice_zone = median(rice_price), by (zone)
+egen median_rice = median(rice_price)
 
-egen num_rice_ea = count(rice_price), by (ea)
-egen num_rice_lga = count(rice_price), by (lga)
-egen num_rice_state = count(rice_price), by (state)
-egen num_rice_zone = count(rice_price), by (zone)
-
-tab num_rice_ea
-tab num_rice_lga
-tab num_rice_state
-tab num_rice_zone
+egen medianri_pr_ea = median(rice_price), by (ea)
+egen num_ri_pr_ea = count(rice_price), by (ea)
 
 
+egen medianri_pr_woreda = median(rice_price), by (woreda)
+egen num_ri_pr_woreda = count(rice_price), by (woreda)
 
-replace rice_price_mr = median_rice_ea if rice_price_mr==. & num_rice_ea>=2
-tab rice_price_mr,missing
+egen medianri_pr_zone = median(rice_price), by (zone)
+egen num_ri_pr_zone = count(rice_price), by (zone)
 
-replace rice_price_mr = median_rice_lga if rice_price_mr==. & num_rice_lga>=2
-tab rice_price_mr,missing
+egen medianri_pr_region = median(rice_price), by (region)
+egen num_ri_pr_region = count(rice_price), by (region)
 
-replace rice_price_mr = median_rice_state if rice_price_mr==. & num_rice_state>=2
-tab rice_price_mr,missing
 
-replace rice_price_mr = median_rice_zone if rice_price_mr==. & num_rice_zone>=2
-tab rice_price_mr,missing
+tab medianri_pr_ea
+tab medianri_pr_woreda
+tab medianri_pr_zone
+tab medianri_pr_region
 
+
+
+tab num_ri_pr_ea
+tab num_ri_pr_woreda
+tab num_ri_pr_zone
+tab num_ri_pr_region
+
+
+
+replace rice_price = medianri_pr_ea if rice_price ==. & num_ri_pr_ea >= 6
+
+tab rice_price,missing
+
+
+replace rice_price = medianri_pr_woreda if rice_price ==. & num_ri_pr_woreda >= 19
+
+tab rice_price,missing
+
+
+
+replace rice_price = medianri_pr_zone if rice_price ==. & num_ri_pr_zone >= 21
+
+tab rice_price,missing
+
+
+replace rice_price = medianri_pr_region if rice_price ==. 
+
+tab rice_price,missing
+
+
+
+replace rice_price = median_rice if rice_price ==. 
+
+tab rice_price,missing
+
+sum rice_price, detail
+
+
+
+gen maize_price_mr = maize_price
+gen rice_price_mr = rice_price
 
 
 
@@ -864,34 +1061,35 @@ tab rice_price_mr,missing
 *Net Buyers and Sellers
 ***************
 
-*s7bq5a from purchases
-*s7bq6a from own production
+sum hh_s5aq03_a , detail
+sum  hh_s5aq05_a , detail
 
-tab s7bq5a
-tab s7bq6a
+replace hh_s5aq03_a = 0 if hh_s5aq03_a<=0 |hh_s5aq03_a==.
+tab hh_s5aq03_a,missing
+replace hh_s5aq05_a = 0 if hh_s5aq05_a<=0 |hh_s5aq05_a==.
+tab hh_s5aq05_a,missing
 
-replace s7bq5a = 0 if s7bq5a<=0 |s7bq5a==.
-tab s7bq5a,missing
-replace s7bq6a = 0 if s7bq6a<=0 |s7bq6a==.
-tab s7bq6a,missing
-
-gen net_seller = 1 if s7bq6a > s7bq5a
+gen net_seller = 1 if hh_s5aq05_a  > hh_s5aq03_a
 tab net_seller,missing
 replace net_seller=0 if net_seller==.
 tab net_seller,missing
 
-gen net_buyer = 1 if s7bq6a < s7bq5a
+gen net_buyer = 1 if hh_s5aq05_a  < hh_s5aq03_a
 tab net_buyer,missing
 replace net_buyer=0 if net_buyer==.
 tab net_buyer,missing
 
 collapse  (max) net_seller net_buyer maize_price_mr rice_price_mr, by(hhid)
 
-gen rea_maize_price_mr = maize_price_mr/0.5179256
+
+
+
+
+gen rea_maize_price_mr = maize_price_mr
 gen real_maize_price_mr = rea_maize_price_mr
 tab real_maize_price_mr
 sum real_maize_price_mr, detail
-gen rea_rice_price_mr = rice_price_mr/0.5179256
+gen rea_rice_price_mr = rice_price_mr
 gen real_rice_price_mr = rea_rice_price_mr
 tab real_rice_price_mr
 sum real_rice_price_mr, detail
@@ -901,7 +1099,7 @@ la var net_buyer "1= if respondent is a net buyer"
 label var real_maize_price_mr "commercial price of maize in naira"
 label var real_rice_price_mr "commercial price of rice in naira"
 sort hhid
-save "${Nigeria_GHS_W3_created_data}\food_prices_2015.dta", replace
+save "${Ethiopia_GHS_W3_created_data}\food_prices_2015.dta", replace
 */
 
 
@@ -1134,6 +1332,35 @@ tab soil_quality, missing
 
 
 
+egen med_soil = median(soil_quality)
+
+ren saq01 region
+ren saq02 zone
+ren saq03 woreda
+
+egen med_soil_ea = median(soil_quality), by (ea_id)
+egen med_soil_woreda = median(soil_quality), by (woreda)
+egen med_soil_zone = median(soil_quality), by (zone)
+egen med_soil_region = median(soil_quality), by (region)
+
+replace soil_quality= med_soil_ea if soil_quality==.
+tab soil_quality, missing
+replace soil_quality= med_soil_woreda if soil_quality==.
+tab soil_quality, missing
+replace soil_quality= med_soil_zone if soil_quality==.
+tab soil_quality, missing
+replace soil_quality= med_soil_region if soil_quality==.
+tab soil_quality, missing
+
+
+replace soil_quality= med_soil if soil_quality==.
+replace soil_quality= 2 if soil_quality==1.5 
+replace soil_quality= 2 if soil_quality==2.5 
+tab soil_quality, missing
+
+
+
+
 egen max_fieldsize = max(field_size), by (hhid)
 replace max_fieldsize= . if max_fieldsize!= max_fieldsize
 order field_size soil_quality hhid max_fieldsize
@@ -1160,30 +1387,6 @@ list hhid parcel_id  field_size soil_quality soil_qty_rev soil_qty_rev2 dup if d
 tab soil_qty_rev2, missing
 
 
-
-egen med_soil = median(soil_qty_rev2)
-
-ren saq01 region
-ren saq02 zone
-ren saq03 woreda
-
-egen med_soil_ea = median(soil_qty_rev2), by (ea_id)
-egen med_soil_woreda = median(soil_qty_rev2), by (woreda)
-egen med_soil_zone = median(soil_qty_rev2), by (zone)
-egen med_soil_region = median(soil_qty_rev2), by (region)
-
-replace soil_qty_rev2= med_soil_ea if soil_qty_rev2==.
-tab soil_qty_rev2, missing
-replace soil_qty_rev2= med_soil_woreda if soil_qty_rev2==.
-tab soil_qty_rev2, missing
-replace soil_qty_rev2= med_soil_zone if soil_qty_rev2==.
-tab soil_qty_rev2, missing
-replace soil_qty_rev2= med_soil_region if soil_qty_rev2==.
-tab soil_qty_rev2, missing
-
-replace soil_qty_rev2= 2 if soil_qty_rev2==1.5 
-replace soil_qty_rev2= 2 if soil_qty_rev2==2.5 
-tab soil_qty_rev2, missing
 
 la define soil 1 "Good" 2 "fair" 3 "poor"
 
@@ -1239,9 +1442,9 @@ sort hhid
 merge 1:1 hhid using "${Ethiopia_GHS_W3_created_data}\safety_net_2015.dta"
 drop _merge
 sort hhid
-*merge 1:1 hhid using "${Ethiopia_GHS_W2_created_data}\food_prices_2013.dta"
-*drop _merge
-*sort hhid
+merge 1:1 hhid using "${Ethiopia_GHS_W3_created_data}\food_prices_2015.dta"
+drop _merge
+sort hhid
 *merge 1:1 hhid using "${Ethiopia_GHS_W2_created_data}\geodata_2013.dta"
 *drop _merge
 *sort hhid
@@ -1259,28 +1462,33 @@ sort hhid
 
 
 
-tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
-*real_maize_price_mr real_rice_price_mr informal_save pry_edu finish_pry finish_sec net_seller net_buyer 
+* informal_save pry_edu finish_pry finish_sec 
 
 
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer 
+
+
+
 proportion femhead formal_credit informal_credit ext_acess attend_sch  safety_net  soil_qty_rev2
 
 
 egen median_mrk = median(mrk_dist_w)
 replace mrk_dist_w= median_mrk if mrk_dist_w==.
 
-egen median_price = median(real_tpricefert_cens_mrk)
-replace real_tpricefert_cens_mrk= median_price if real_tpricefert_cens_mrk==.
+*egen median_price = median(real_tpricefert_cens_mrk)
+*replace real_tpricefert_cens_mrk= median_price if real_tpricefert_cens_mrk==.
 
 egen median_age = median(hh_headage)
 replace hh_headage= median_age if hh_headage==.
 
 egen median_soil = median(soil_qty_rev2)
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+
+
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer 
 
 sum total_qty_w, detail
 
@@ -1301,15 +1509,18 @@ order year
 
 
 
-tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 *real_maize_price_mr real_rice_price_mr informal_save pry_edu finish_pry finish_sec net_seller net_buyer 
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer 
+
+sum real_tpricefert_cens_mrk, detail
 
 
-
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\completed15.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_heckman15.dta", replace
 
 
 

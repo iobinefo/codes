@@ -45,33 +45,6 @@ save  "${Uganda_GHS_W6_created_data}/ag_rainy_18.dta", replace
 
 
 /*
-********************************************************************************
-* Household  *
-********************************************************************************
-
-use "${Uganda_GHS_W3_raw_data}\GSEC1.dta",clear  
-
-ren HHID hhidd
-
-list hhidd if real(hhidd) == .
-gen HHID = real(regexr(hhidd, "[^0-9.]", ""))
-
-
-
-ren comm ea
-encode  h1aq1, gen  (district)
-ren mult  weight
-ren sregion stratum
-
-keep  region stratum district ea weight  HHID
-
-*collapse (max) region stratum district ea (mean) weight, by (HHID)
-
-save  "${Uganda_GHS_W4_created_data}/hhids.dta", replace
-*/
-
-
-/*
 
 ************************
 *Geodata Variables
@@ -196,8 +169,8 @@ tab tpricefert_cens, missing
 sum tpricefert_cens, detail
 gen tpricefert_cens_mrk = tpricefert_cens
 
-
 /*
+
 ************generating the median age**************
 
 
@@ -805,12 +778,11 @@ tab worker,missing
  
 save "${Uganda_GHS_W6_created_data}\labor_age_2018.dta", replace
 
-/*
+
 ********************************
 *Safety Net
 ********************************
 
-*use "${Uganda_GHS_W6_raw_data}\hh\GSEC7_1.dta",clear 
 use "${Uganda_GHS_W6_raw_data}\hh\GSEC7_2.dta",clear 
 
 
@@ -818,216 +790,224 @@ merge m:1 hhid using "${Uganda_GHS_W6_created_data}/ag_rainy_18.dta", gen(filter
 
 keep if ag_rainy_18==1
 
+tab IncomeSource
+tab s11q04
+
 
 *h11q6 received remmitance
-tab hh_s12q01 , nolabel
-tab hh_s13q01 , nolabel
+tab IncomeSource
+tab IncomeSource , nolabel
 
 
-gen safety_net =1  if hh_s12q01==1 | hh_s13q01 ==1 
+
+gen safety_net =1  if s11q04==1 & ( IncomeSource==42 | IncomeSource ==43) 
 replace safety_net =0 if safety_net==.
 tab safety_net,missing
 collapse (max) safety_net, by (hhid)
 
-
 tab safety_net
 la var safety_net "=1 if received cash transfer, cash for work, food for work or other assistance"
 save "${Uganda_GHS_W6_created_data}\safety_net_2018.dta", replace
-*/
-/*
+
+
+
+
+
+
+
+
+
+
 **************************************
 *Food Prices
 **************************************
-use "${Uganda_GHS_W6_raw_data}\GSEC15b.dta", clear
-
-
-use "${Uganda_GHS_W6_raw_data}\GSEC15c.dta", clear
-
-use "${Uganda_GHS_W6_raw_data}\GSEC15d.dta", clear
-
-
-gen maize_price=c8q2 if item_cd==3
-tab maize_price,missing
-sum maize_price,detail
-tab maize_price
-
-replace maize_price = 900 if maize_price >900 & maize_price<.  //bottom 2%
-*replace maize_price = 10 if maize_price< 10        ////top 5%
-
-
-
-egen median_pr_ea = median(maize_price), by (ea)
-egen median_pr_lga = median(maize_price), by (lga)
-egen median_pr_state = median(maize_price), by (state)
-egen median_pr_zone = median(maize_price), by (zone)
-
-egen num_pr_ea = count(maize_price), by (ea)
-egen num_pr_lga = count(maize_price), by (lga)
-egen num_pr_state = count(maize_price), by (state)
-egen num_pr_zone = count(maize_price), by (zone)
-
-tab num_pr_ea
-tab num_pr_lga
-tab num_pr_state
-tab num_pr_zone
-
-
-gen maize_price_mr = maize_price
-
-replace maize_price_mr = median_pr_ea if maize_price_mr==. & num_pr_ea>=2
-tab maize_price_mr,missing
-
-replace maize_price_mr = median_pr_lga if maize_price_mr==. & num_pr_lga>=2
-tab maize_price_mr,missing
-
-replace maize_price_mr = median_pr_state if maize_price_mr==. & num_pr_state>=2
-tab maize_price_mr,missing
-
-replace maize_price_mr = median_pr_zone if maize_price_mr==. & num_pr_zone>=2
-tab maize_price_mr,missing
-
-
-
-****************
-*rice price
-***************
-
-
-gen rice_price=c8q2 if item_cd==7
-tab rice_price,missing
-sum rice_price,detail
-tab rice_price
-
-replace rice_price = 750 if rice_price >750 & rice_price<.   //bottom 2%
-*replace rice_price = 25 if rice_price< 25   //top 3%
-tab rice_price,missing
-
-
-
-egen median_rice_ea = median(rice_price), by (ea)
-egen median_rice_lga = median(rice_price), by (lga)
-egen median_rice_state = median(rice_price), by (state)
-egen median_rice_zone = median(rice_price), by (zone)
-
-egen num_rice_ea = count(rice_price), by (ea)
-egen num_rice_lga = count(rice_price), by (lga)
-egen num_rice_state = count(rice_price), by (state)
-egen num_rice_zone = count(rice_price), by (zone)
-
-tab num_rice_ea
-tab num_rice_lga
-tab num_rice_state
-tab num_rice_zone
-
-
-gen rice_price_mr = rice_price
-
-replace rice_price_mr = median_rice_ea if rice_price_mr==. & num_rice_ea>=2
-tab rice_price_mr,missing
-
-replace rice_price_mr = median_rice_lga if rice_price_mr==. & num_rice_lga>=2
-tab rice_price_mr,missing
-
-replace rice_price_mr = median_rice_state if rice_price_mr==. & num_rice_state>=2
-tab rice_price_mr,missing
-
-replace rice_price_mr = median_rice_zone if rice_price_mr==. & num_rice_zone>=2
-tab rice_price_mr,missing
-
-
-sort zone state ea
-collapse (max) maize_price_mr rice_price_mr , by (zone state lga sector ea)
-
-
-save "${Uganda_GHS_W6_created_data}\food_prices.dta", replace
-
-
-
-
-**************
-*Net Buyers and Sellers
-***************
 use "${Uganda_GHS_W6_raw_data}\hh\GSEC15B.dta", clear
-
-use "${Uganda_GHS_W6_raw_data}\hh\GSEC15E.dta", clear
-
-
-merge m:1 zone state lga sector ea using "${Uganda_GHS_W5_created_data}\food_prices.dta", keepusing ( maize_price_mr rice_price_mr)
-
 
 merge m:1 hhid using "${Uganda_GHS_W6_created_data}/ag_rainy_18.dta", gen(filter)
 
 keep if ag_rainy_18==1
 
-
-
-**********
-*maize
-*********
-egen median_pr_ea = median(maize_price), by (ea)
-egen median_pr_lga = median(maize_price), by (lga)
-egen median_pr_state = median(maize_price), by (state)
-egen median_pr_zone = median(maize_price), by (zone)
-
-egen num_pr_ea = count(maize_price), by (ea)
-egen num_pr_lga = count(maize_price), by (lga)
-egen num_pr_state = count(maize_price), by (state)
-egen num_pr_zone = count(maize_price), by (zone)
-
-tab num_pr_ea
-tab num_pr_lga
-tab num_pr_state
-tab num_pr_zone
+tab CEB03C
 
 
 
-replace maize_price_mr = median_pr_ea if maize_price_mr==. & num_pr_ea>=2
-tab maize_price_mr,missing
 
-replace maize_price_mr = median_pr_lga if maize_price_mr==. & num_pr_lga>=2
-tab maize_price_mr,missing
+tab CEB01 if CEB01==110
+tab CEB01 if CEB01==111
 
-replace maize_price_mr = median_pr_state if maize_price_mr==. & num_pr_state>=2
-tab maize_price_mr,missing
 
-replace maize_price_mr = median_pr_zone if maize_price_mr==. & num_pr_zone>=2
-tab maize_price_mr,missing
+tab CEB03C if CEB01==110 //rice
+tab CEB03C if CEB01==110, nolabel
+tab CEB03C if CEB01==111 //maize
+tab CEB03C if CEB01==111, nolabel
+*market price
+
+
+
+*gen maize_price=h15bq12 if  itmcd==111
+
+
+
+
+gen maize_price=CEB14c  if  CEB01==111 & CEB03C==1
+replace maize_price=CEB14c /2 if CEB01==111 & CEB03C==29
+replace maize_price=CEB14c *2 if CEB01==111 & CEB03C==32
+*br maize_price CEB14c  CEB01 CEB03C if CEB01==111 
+replace maize_price=CEB14c /2 if CEB01==111 & CEB03C==77 
+replace maize_price=CEB14c *10 if CEB01==111 & CEB03C==107 
+replace maize_price=CEB14c *16.67 if CEB01==111 & CEB03C==108
+replace maize_price=CEB14c *20 if CEB01==111 & CEB03C==109
+*/
+
+
+tab maize_price,missing
+sum maize_price,detail
+tab maize_price
+
+replace maize_price = 8335 if maize_price >8335 & maize_price<.  //bottom 2%
+*replace maize_price = 10 if maize_price< 10        ////top 5%
+
+
+
+************generating the median age**************
+
+egen median_maize = median(maize_price)
+*egen medianhh_pr_ea = median(maize_price), by (ea)
+egen medianhh_pr_district  = median(maize_price), by (district )
+egen medianhh_pr_stratum = median(maize_price), by (stratum )
+
+egen medianhh_pr_region  = median(maize_price), by (region )
+
+
+*egen num_hh_ea = count(maize_price), by (ea)
+egen num_hh_region  = count(maize_price), by (region )
+egen num_hh_stratum = count(maize_price), by (stratum )
+egen num_hh_district  = count(maize_price), by (district)
+
+
+*tab num_hh_ea
+tab num_hh_district
+tab num_hh_stratum
+tab num_hh_region
+
+
+
+
+
+
+*replace maize_price = medianhh_pr_ea if maize_price ==. & num_hh_ea >= 4
+
+*tab maize_price,missing
+
+
+replace maize_price = medianhh_pr_district if maize_price ==. & num_hh_district >= 1
+
+tab maize_price,missing
+
+
+
+replace maize_price = medianhh_pr_stratum if maize_price ==. & num_hh_stratum >= 1
+
+tab maize_price,missing
+
+
+replace maize_price = medianhh_pr_region if maize_price ==. 
+
+tab maize_price,missing
+
+replace maize_price = median_maize if maize_price ==. 
+
+tab maize_price,missing
+
+sum maize_price, detail
+
+
 
 
 ****************
 *rice price
 ***************
+sum CEB14c  if CEB01==110 , detail
+sum CEB14c  if CEB01==110 & CEB03C==1, detail
+*br h15bq12 itmcd untcd if itmcd==110 & untcd==1
+
+tab CEB03C if CEB01==110 //rice
+tab CEB03C if CEB01==110, nolabel
+*gen rice_price=h15bq12 if  itmcd==110 
 
 
-egen median_rice_ea = median(rice_price), by (ea)
-egen median_rice_lga = median(rice_price), by (lga)
-egen median_rice_state = median(rice_price), by (state)
-egen median_rice_zone = median(rice_price), by (zone)
-
-egen num_rice_ea = count(rice_price), by (ea)
-egen num_rice_lga = count(rice_price), by (lga)
-egen num_rice_state = count(rice_price), by (state)
-egen num_rice_zone = count(rice_price), by (zone)
-
-tab num_rice_ea
-tab num_rice_lga
-tab num_rice_state
-tab num_rice_zone
+gen rice_price=CEB14c if  CEB01==110 & CEB03C==1
+replace rice_price=CEB14c*2 if CEB01==110 & CEB03C==32
+*br rice_price CEB14c CEB01 CEB03C if CEB01==110 
+replace rice_price=CEB14c/2 if CEB01==110 & CEB03C==77 
+replace rice_price=CEB14c*10 if CEB01==110 & CEB03C==107 
+replace rice_price=CEB14c*16.67 if CEB01==110 & CEB03C==108
+*/
 
 
 
-replace rice_price_mr = median_rice_ea if rice_price_mr==. & num_rice_ea>=2
-tab rice_price_mr,missing
+tab rice_price,missing
+sum rice_price,detail
+tab rice_price
 
-replace rice_price_mr = median_rice_lga if rice_price_mr==. & num_rice_lga>=2
-tab rice_price_mr,missing
+replace rice_price = 4500 if rice_price >4500 & rice_price<.  //bottom 2%
 
-replace rice_price_mr = median_rice_state if rice_price_mr==. & num_rice_state>=2
-tab rice_price_mr,missing
 
-replace rice_price_mr = median_rice_zone if rice_price_mr==. & num_rice_zone>=2
-tab rice_price_mr,missing
+************generating the median age**************
 
+egen median_rice = median(rice_price)
+*egen medianri_pr_ea = median(rice_price), by (ea)
+egen medianri_pr_district  = median(rice_price), by (district )
+egen medianri_pr_stratum = median(rice_price), by (stratum )
+
+egen medianri_pr_region  = median(rice_price), by (region )
+
+
+*egen num_ri_ea = count(rice_price), by (ea)
+egen num_ri_region  = count(rice_price), by (region )
+egen num_ri_stratum = count(rice_price), by (stratum )
+egen num_ri_district  = count(rice_price), by (district)
+
+
+*tab num_ri_ea
+tab num_ri_district
+tab num_ri_stratum
+tab num_ri_region
+
+
+
+
+
+
+*replace rice_price = medianri_pr_ea if rice_price ==. & num_ri_ea >= 8
+
+*tab rice_price,missing
+
+
+replace rice_price = medianri_pr_district if rice_price ==. & num_ri_district >= 3
+
+tab rice_price,missing
+
+
+
+replace rice_price = medianri_pr_stratum if rice_price ==. & num_ri_stratum >= 15
+
+tab rice_price,missing
+
+
+replace rice_price = medianri_pr_region if rice_price ==. 
+
+tab rice_price,missing
+
+replace rice_price = median_rice if rice_price ==. 
+
+tab rice_price,missing
+
+sum rice_price, detail
+
+
+gen maize_price_mr = maize_price
+gen rice_price_mr = rice_price
 
 
 
@@ -1037,34 +1017,38 @@ tab rice_price_mr,missing
 *Net Buyers and Sellers
 ***************
 
-*s7bq5a from purchases
-*s7bq6a from own production
+*h15bq4 from purchases
+*h15bq8 from own production
 
-tab s7bq5a
-tab s7bq6a
+tab CEB06 
+tab CEB08
+tab CEB09
 
-replace s7bq5a = 0 if s7bq5a<=0 |s7bq5a==.
-tab s7bq5a,missing
-replace s7bq6a = 0 if s7bq6a<=0 |s7bq6a==.
-tab s7bq6a,missing
 
-gen net_seller = 1 if s7bq6a > s7bq5a
+replace CEB06 = CEB08 if CEB06<=0 |CEB06==.
+tab CEB06,missing
+replace CEB06 = 0 if CEB06<=0 |CEB06==.
+tab CEB06,missing
+replace CEB09 = 0 if CEB09<=0 |CEB09==.
+tab CEB09,missing
+
+gen net_seller = 1 if CEB09 > CEB06
 tab net_seller,missing
 replace net_seller=0 if net_seller==.
 tab net_seller,missing
 
-gen net_buyer = 1 if s7bq6a < s7bq5a
+gen net_buyer = 1 if CEB09 < CEB06
 tab net_buyer,missing
 replace net_buyer=0 if net_buyer==.
 tab net_buyer,missing
 
 collapse  (max) net_seller net_buyer maize_price_mr rice_price_mr, by(hhid)
 
-gen rea_maize_price_mr = maize_price_mr/0.5179256
+gen rea_maize_price_mr = maize_price_mr    // 0.8762497
 gen real_maize_price_mr = rea_maize_price_mr
 tab real_maize_price_mr
 sum real_maize_price_mr, detail
-gen rea_rice_price_mr = rice_price_mr/0.5179256
+gen rea_rice_price_mr = rice_price_mr    // 0.8762497
 gen real_rice_price_mr = rea_rice_price_mr
 tab real_rice_price_mr
 sum real_rice_price_mr, detail
@@ -1074,7 +1058,7 @@ la var net_buyer "1= if respondent is a net buyer"
 label var real_maize_price_mr "commercial price of maize in naira"
 label var real_rice_price_mr "commercial price of rice in naira"
 sort hhid
-save "${Uganda_GHS_W5_created_data}\food_prices_2015.dta", replace
+save "${Uganda_GHS_W6_created_data}\food_prices_2018.dta", replace
 
 */
 
@@ -1487,58 +1471,6 @@ list hhid parcelID  field_size soil_quality soil_qty_rev soil_qty_rev2 dup if du
 tab soil_qty_rev2, missing
 
 
-/*
-************generating the median soil quality**************
-
-egen median_soil_ea = median(soil_qty_rev2), by (ea)
-egen median_soil_district  = median(soil_qty_rev2), by (district )
-egen median_soil_stratum = median(soil_qty_rev2), by (stratum )
-egen median_soil_region  = median(soil_qty_rev2), by (region )
-
-egen med_soil = median(soil_qty_rev2)
-
-
-egen num_ea = count(soil_qty_rev2), by (ea)
-egen numregion  = count(soil_qty_rev2), by (region )
-egen num_stratum = count(soil_qty_rev2), by (stratum )
-egen num_district  = count(soil_qty_rev2), by (district)
-
-
-tab num_ea
-tab num_district
-tab num_stratum
-tab num_region
-
-
-
-
-replace soil_qty_rev2= median_soil_ea if soil_qty_rev2==.  & num_ea >= 13
-tab soil_qty_rev2, missing
-
-replace soil_qty_rev2= median_soil_district if soil_qty_rev2==.  & num_district >= 13
-tab soil_qty_rev2, missing
-
-
-replace soil_qty_rev2= median_soil_stratum if soil_qty_rev2==.  & num_stratum >= 13
-tab soil_qty_rev2, missing
-
-
-replace soil_qty_rev2= median_soil_region if soil_qty_rev2==.  
-tab soil_qty_rev2, missing
-
-
-replace soil_qty_rev2 = med_soil if soil_qty_rev2 ==. 
-
-tab soil_qty_rev2,missing
-*/
-
-
-
-
-
-*replace soil_qty_rev2= 2 if soil_qty_rev2== 2.5
-*tab soil_qty_rev2, missing
-
 la define soil 1 "Good" 2 "fair" 3 "poor"
 
 *la value soil soil_qty_rev2
@@ -1599,12 +1531,12 @@ sort hhid
 merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\labor_age_2018.dta"
 drop _merge
 sort hhid
-*merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\safety_net_2018.dta"
-*drop _merge
+merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\safety_net_2018.dta"
+drop _merge
 sort hhid
-*merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\food_prices_2018.dta"
-*drop _merge
-*sort hhid
+merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\food_prices_2018.dta"
+drop _merge
+sort hhid
 *merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\geodata_2018.dta"
 *drop _merge
 *sort hhid
@@ -1629,13 +1561,13 @@ gen year = 2018
 
 
 
-tabstat total_qty_w real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr  mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
-*real_maize_price_mr real_rice_price_mr  pry_edu finish_pry finish_sec net_seller net_buyer safety_net
+* pry_edu finish_pry finish_sec 
 
 
 
-misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net
 
 *credit formal_save informal_save
 *proportion femhead credit formal_save informal_save ext_acess attend_sch  safety_net  soil_qty_rev2
@@ -1652,14 +1584,16 @@ replace mrk_dist_w= median_mrk if mrk_dist_w==.
 *replace hh_headage= median_age if hh_headage==.
 
 
-egen median_qty = median(total_qty_w)
-replace total_qty_w= median_qty if total_qty_w==.
+replace real_tpricefert_cens_mrk= 0 if real_tpricefert_cens_mrk==.
+
+replace total_qty_w= 0 if total_qty_w==.
 
 egen median_soil = median(soil_qty_rev2)
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
 
 
-misstable summarize femhead  ext_acess attend_sch informal_credit formal_credit  formal_save informal_save total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2
+
+misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net
 
 *credit formal_save informal_save safety_net
 sum total_qty_w, detail
@@ -1667,7 +1601,6 @@ sum real_tpricefert_cens_mrk, detail
 ren t0_hhid HHID 
 
 save "${Uganda_GHS_W6_created_data}\Uganda_wave6_complete_data.dta", replace
-
 
 
 
@@ -1691,136 +1624,19 @@ order year
 
 
 
-tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk  real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 *real_maize_price_mr real_rice_price_mr informal_save pry_edu finish_pry finish_sec net_seller net_buyer 
 
-misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit
+
+
+
+
+
+misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net
+
+
 
 * safety_net
 
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\completed18.dta", replace
-
-
-
-
-
-
-use "C:\Users\obine\Music\Documents\Project\codes\Uganda\completed18.dta", clear
-
-
-
-
-sort HHID year
-order HHID
-
-gen dummy = 1
-
-collapse (sum) dummy, by (HHID)
-
-tab dummy
-keep if dummy==2
-sort HHID
-
-
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_completed18.dta", replace
-
-
-merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\completed18.dta"
-
-
-
-
-drop if _merge==2
-sort HHID year
-order HHID year
-
-
-
-
-gen year_2015 = (year==2015)
-gen year_2018 = (year==2018)
-
-gen commercial_dummy = (total_qty_w>0)
-
-
-misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit
-
-tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-*formal_credit informal_credit safety_net
-
-local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding femhead  ext_acess attend_sch soil_qty_rev2 formal_credit informal_credit"
-
-foreach x in `time_avg' {
-
-	bysort HHID : egen TAvg_`x' = mean(`x')
-
-}
-
-
-heckman real_tpricefert_cens_mrk  land_holding ext_acess attend_sch  i.year, select (commercial_dummy= mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding femhead ext_acess attend_sch soil_qty_rev2 formal_credit informal_credit  i.region i.year) twostep
-
-
-predict yhat, xb
-
-
-tab yhat, missing
-
-sum yhat [aw= weight], detail
-
-
-
-
-*gen lyhat = log(yhat)
-
-
-local time_avg "yhat"
-
-foreach x in `time_avg' {
-
-	bysort HHID : egen TAvg_`x' = mean(`x')
-
-}
-
-** CRE-TOBIT 
-tobit total_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker land_holding femhead ext_acess attend_sch soil_qty_rev2  formal_credit informal_credit TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_ext_acess TAvg_attend_sch  TAvg_soil_qty_rev2 TAvg_formal_credit TAvg_informal_credit i.region i.year, ll(0)
-
-margins, predict(ystar(0,.)) dydx(*) post
-
-tabstat total_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-** CRE-TOBIT 
-tobit total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding femhead ext_acess attend_sch soil_qty_rev2  formal_credit informal_credit TAvg_total_qty_w TAvg_mrk_dist_w TAvg_real_tpricefert_cens_mrk TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_ext_acess TAvg_attend_sch  TAvg_soil_qty_rev2 TAvg_formal_credit TAvg_informal_credit i.region i.year, ll(0)
-
-margins, predict(ystar(0,.)) dydx(*) post
-
-tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18.dta", replace

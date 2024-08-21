@@ -1468,7 +1468,7 @@ append  using "C:\Users\obine\Music\Documents\Project\codes\without_median\tanza
 
 append using "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\tza_wave2020\tanzania_wave5_completedata_2020.dta"
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\complete_panel5.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\Nominal_panel5.dta", replace
 
 order year
 
@@ -1480,10 +1480,10 @@ tab dummy
 keep if dummy==4
 sort UPHI
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\subset_complete_files", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\subset_Nominal_panel5_files", replace
 
 
-merge 1:m UPHI using "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\complete_panel5.dta", gen(fil)
+merge 1:m UPHI using "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\Nominal_panel5.dta", gen(fil)
 
 drop if fil==2
 
@@ -1550,7 +1550,7 @@ misstable summarize subsidy_dummy femhead formal_save formal_bank formal_credit 
 proportion subsidy_dummy femhead formal_save formal_bank formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\complete_panel5.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\Nominal_panel5.dta", replace
 
 
 

@@ -1,0 +1,71 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx3600\clbrdrt\brdrs\cellx5184
+\ql \cell\qc (1)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx3600\cellx5184
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx3600\clbrdrb\brdrs\cellx5184
+\ql VARIABLES\cell\qc y1\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx3600\cellx5184
+\ql \cell\qc \cell\row
+\ql mrk_dist_w\cell\qc 0.0321***\cell\row
+\ql \cell\qc (0.0105)\cell\row
+\ql lyhat\cell\qc 1.046\cell\row
+\ql \cell\qc (0.660)\cell\row
+\ql real_maize_price_mr\cell\qc 0.000389\cell\row
+\ql \cell\qc (0.000274)\cell\row
+\ql hh_headage\cell\qc 0.00721\cell\row
+\ql \cell\qc (0.00780)\cell\row
+\ql lland_holding\cell\qc 0.204**\cell\row
+\ql \cell\qc (0.0893)\cell\row
+\ql femhead\cell\qc 0.0983\cell\row
+\ql \cell\qc (0.167)\cell\row
+\ql ext_acess\cell\qc 0.841***\cell\row
+\ql \cell\qc (0.235)\cell\row
+\ql attend_sch\cell\qc -0.227*\cell\row
+\ql \cell\qc (0.116)\cell\row
+\ql safety_net\cell\qc 0.0111\cell\row
+\ql \cell\qc (0.0704)\cell\row
+\ql formal_credit\cell\qc 0.385***\cell\row
+\ql \cell\qc (0.127)\cell\row
+\ql informal_credit\cell\qc 0.0112\cell\row
+\ql \cell\qc (0.0895)\cell\row
+\ql num_mem\cell\qc -0.00245\cell\row
+\ql \cell\qc (0.0473)\cell\row
+\ql worker\cell\qc 0.0556*\cell\row
+\ql \cell\qc (0.0304)\cell\row
+\ql TAvg_ltotal_qty_w\cell\qc 0.761***\cell\row
+\ql \cell\qc (0.0895)\cell\row
+\ql TAvg_mrk_dist_w\cell\qc -0.0232***\cell\row
+\ql \cell\qc (0.00769)\cell\row
+\ql TAvg_lyhat\cell\qc -0.391\cell\row
+\ql \cell\qc (0.747)\cell\row
+\ql TAvg_hh_headage\cell\qc -0.00711\cell\row
+\ql \cell\qc (0.00828)\cell\row
+\ql TAvg_femhead\cell\qc -0.105\cell\row
+\ql \cell\qc (0.164)\cell\row
+\ql TAvg_ext_acess\cell\qc -0.811**\cell\row
+\ql \cell\qc (0.323)\cell\row
+\ql TAvg_attend_sch\cell\qc 0.131\cell\row
+\ql \cell\qc (0.119)\cell\row
+\ql TAvg_safety_net\cell\qc -0.0602\cell\row
+\ql \cell\qc (0.0734)\cell\row
+\ql TAvg_real_maize_price_mr\cell\qc -0.000213\cell\row
+\ql \cell\qc (0.000331)\cell\row
+\ql TAvg_lland_holding\cell\qc -0.303***\cell\row
+\ql \cell\qc (0.0852)\cell\row
+\ql TAvg_formal_credit\cell\qc -0.334***\cell\row
+\ql \cell\qc (0.129)\cell\row
+\ql TAvg_informal_credit\cell\qc 0.0406\cell\row
+\ql \cell\qc (0.0955)\cell\row
+\ql TAvg_num_mem\cell\qc -0.00114\cell\row
+\ql \cell\qc (0.0485)\cell\row
+\ql TAvg_worker\cell\qc -0.0603*\cell\row
+\ql \cell\qc (0.0331)\cell\row
+\ql 2015.year\cell\qc 0.00271\cell\row
+\ql \cell\qc (0.0943)\cell\row
+\ql \cell\qc \cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx3600\clbrdrb\brdrs\cellx5184
+\ql Observations\cell\qc 5,828\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}

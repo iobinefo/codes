@@ -1,6 +1,7 @@
 
 
-
+*************************************************
+*Heckman 2018
 
 use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_price21.dta", clear
 use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_price21.dta", clear
@@ -13,15 +14,32 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real
 
 misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region
 
+
+*replace hh_headage = 66 if hh_headage >66 //bottom 90%
+replace land_holding = 2.341905 if land_holding >2.341905 //bottom 90%
+ 
+replace real_hhvalue = 0 if real_hhvalue <=0 //bottom 90%
+gen lland_holding = log(land_holding)
+gen lreal_hhvalue = log(real_hhvalue  + 1)
+
+*histogram lreal_hhvalue, width(5) frequency normal
+*histogram land_holding, width(5) frequency normal
+sum real_hhvalue, detail
+sum land_holding, detail
+sum lland_holding, detail
+
+
+
 sum real_tpricefert_cens_mrk, detail
 
-local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2"
+local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue"
 
 foreach x in `time_avg' {
 
 	bysort hhid : egen TAvg_`x' = mean(`x')
 
 }
+
 
 
 
@@ -36,7 +54,13 @@ program define myboot, rclass
  preserve 
 
 
-heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr real_rice_price_mr land_holding attend_sch formal_credit informal_credit ext_acess year_2018  year_2021, select (commercial_dummy= mrk_dist_w hh_headage real_hhvalue land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer year_2018 year_2021) twostep
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch land_holding ext_acess formal_credit informal_credit year_2018  year_2021, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  land_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2018 year_2021) twostep
+
+
+
+* formal_credit informal_credit formal_credit informal_credit TAvg_formal_credit TAvg_informal_credit land_holding lland_holding TAvg_land_holding 
+
+*num_mem worker TAvg_num_mem TAvg_worker real_rice_price_mr TAvg_real_rice_price_mr
 
 
 predict yhat, xb
@@ -48,6 +72,9 @@ gen lyhat = log(yhat)
 
 gen ltotal_qty_w = log(total_qty_w + 1)
 
+*histogram total_qty_w, width(50) frequency normal
+*histogram ltotal_qty_w, width(5) frequency normal
+
 local time_avg "lyhat ltotal_qty_w"
 
 foreach x in `time_avg' {
@@ -57,7 +84,9 @@ foreach x in `time_avg' {
 }
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w mrk_dist_w lyhat real_maize_price_mr real_rice_price_mr net_seller net_buyer hh_headage real_hhvalue land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lyhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_net_seller TAvg_net_buyer i.year, ll(0)
+tobit ltotal_qty_w mrk_dist_w lyhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lyhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
+
+
 
 margins, predict(ystar(0,.)) dydx(*) post
 
@@ -65,8 +94,12 @@ restore
 end
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_real_heckman_original.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_nominal_heckman.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
 
 
+*outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Logtrying_nominal_heckman.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace
 
 
 
@@ -80,7 +113,8 @@ program define myboot, rclass
 preserve 
 
 
-heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr real_rice_price_mr land_holding attend_sch formal_credit informal_credit ext_acess year_2018  year_2021, select (commercial_dummy= mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer year_2018  year_2021) twostep
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch land_holding ext_acess formal_credit informal_credit year_2018  year_2021, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  land_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2018 year_2021) twostep
+
 
 
 predict yhat, xb
@@ -95,8 +129,7 @@ foreach x in `time_avg' {
 
 }
 
-tobit total_qty_w mrk_dist_w yhat real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_net_seller TAvg_net_buyer i.year, ll(0)
-
+tobit total_qty_w mrk_dist_w yhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
 
 
 margins, predict(ystar(0,.)) dydx(*) post
@@ -105,6 +138,9 @@ end
 
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_real_heckman_original.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_nominal_heckman.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
 
 
 tabstat total_qty_w mrk_dist_w yhat real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
@@ -127,9 +163,32 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real
 
 misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region
 
+
+replace hh_headage = 69 if hh_headage >69 //bottom 90%
+replace real_hhvalue = 0 if real_hhvalue <=0 //bottom 90%
+replace land_holding = 3.072941  if land_holding >3.072941  //bottom 90%
+ 
+ 
+ 
+gen lland_holding = log(land_holding)
+gen lreal_hhvalue = log(real_hhvalue)
+
+tab hh_headage, missing
+*histogram hh_headage, width(5) frequency normal
+*histogram lreal_hhvalue, width(5) frequency normal
+*histogram land_holding, width(5) frequency normal
+sum real_hhvalue, detail
+sum lland_holding, detail
+tab land_holding
+
+
+
+
+
+
 sum real_tpricefert_cens_mrk, detail
 
-local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2"
+local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue"
 
 foreach x in `time_avg' {
 
@@ -149,8 +208,10 @@ program define myboot, rclass
  preserve 
 
 
-heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr real_rice_price_mr land_holding attend_sch formal_credit informal_credit ext_acess year_2013  year_2015, select (commercial_dummy= mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer year_2013  year_2015) twostep
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch lland_holding ext_acess formal_credit informal_credit year_2013  year_2015, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  lland_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2013  year_2015) twostep
 
+
+*soil_qty_rev2  lreal_hhvalue TAvg_soil_qty_rev2 TAvg_lreal_hhvalue
 
 predict yhat, xb
 
@@ -170,7 +231,8 @@ foreach x in `time_avg' {
 }
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w mrk_dist_w lyhat real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lyhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_net_seller TAvg_net_buyer i.year, ll(0)
+tobit ltotal_qty_w mrk_dist_w lyhat real_maize_price_mr hh_headage  lland_holding femhead ext_acess attend_sch  safety_net formal_credit informal_credit num_mem worker TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lyhat  TAvg_hh_headage  TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net  TAvg_real_maize_price_mr  TAvg_lland_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
+
 
 margins, predict(ystar(0,.)) dydx(*) post
 
@@ -178,6 +240,9 @@ restore
 end
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_real_heckman_original15.doc", replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log2_nominal_heckman15.doc",   replace word
 
 
 
@@ -193,7 +258,7 @@ program define myboot, rclass
 preserve 
 
 
-heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr real_rice_price_mr land_holding attend_sch formal_credit informal_credit ext_acess year_2013  year_2015, select (commercial_dummy= mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer year_2013  year_2015) twostep
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch land_holding ext_acess formal_credit informal_credit year_2013  year_2015, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  land_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2013  year_2015) twostep
 
 
 predict yhat, xb
@@ -208,7 +273,7 @@ foreach x in `time_avg' {
 
 }
 
-tobit total_qty_w mrk_dist_w yhat real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_land_holding TAvg_femhead TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_net_seller TAvg_net_buyer i.year, ll(0)
+tobit total_qty_w mrk_dist_w yhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.region i.year, ll(0)
 
 
 
@@ -218,6 +283,9 @@ end
 
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_real_heckman_original15.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_nominal_heckman15.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
 
 
 tabstat total_qty_w mrk_dist_w yhat real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)

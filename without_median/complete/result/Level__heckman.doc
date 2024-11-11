@@ -1,0 +1,71 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx3456\clbrdrt\brdrs\cellx4896
+\ql \cell\qc (1)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx3456\cellx4896
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx3456\clbrdrb\brdrs\cellx4896
+\ql VARIABLES\cell\qc y1\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx3456\cellx4896
+\ql \cell\qc \cell\row
+\ql yhat\cell\qc -0.137\cell\row
+\ql \cell\qc (0.713)\cell\row
+\ql subsidy_qty_w\cell\qc -0.427\cell\row
+\ql \cell\qc (0.450)\cell\row
+\ql mrk_dist_w\cell\qc -0.288\cell\row
+\ql \cell\qc (1.300)\cell\row
+\ql ext_acess\cell\qc 12.32\cell\row
+\ql \cell\qc (18.81)\cell\row
+\ql attend_sch\cell\qc 5.828\cell\row
+\ql \cell\qc (6.426)\cell\row
+\ql safety_net\cell\qc -0.496\cell\row
+\ql \cell\qc (8.127)\cell\row
+\ql femhead\cell\qc -21.57***\cell\row
+\ql \cell\qc (8.114)\cell\row
+\ql real_rice_price_mr\cell\qc -0.0198\cell\row
+\ql \cell\qc (0.0624)\cell\row
+\ql lland_holding\cell\qc 5.653\cell\row
+\ql \cell\qc (20.48)\cell\row
+\ql lreal_hhvalue\cell\qc -2.044\cell\row
+\ql \cell\qc (1.637)\cell\row
+\ql soil_qty_rev2\cell\qc 1.945\cell\row
+\ql \cell\qc (5.554)\cell\row
+\ql hh_headage\cell\qc -0.506\cell\row
+\ql \cell\qc (0.943)\cell\row
+\ql TAvg_total_qty_w\cell\qc 0.509***\cell\row
+\ql \cell\qc (0.0242)\cell\row
+\ql TAvg_subsidy_qty_w\cell\qc 0.257\cell\row
+\ql \cell\qc (0.728)\cell\row
+\ql TAvg_mrk_dist_w\cell\qc 0.320\cell\row
+\ql \cell\qc (1.079)\cell\row
+\ql TAvg_yhat\cell\qc -0.0678\cell\row
+\ql \cell\qc (0.635)\cell\row
+\ql TAvg_ext_acess\cell\qc -20.92\cell\row
+\ql \cell\qc (19.49)\cell\row
+\ql TAvg_attend_sch\cell\qc -8.765\cell\row
+\ql \cell\qc (8.311)\cell\row
+\ql TAvg_safety_net\cell\qc 20.11\cell\row
+\ql \cell\qc (12.93)\cell\row
+\ql TAvg_femhead\cell\qc 20.65**\cell\row
+\ql \cell\qc (8.794)\cell\row
+\ql TAvg_real_rice_price_mr\cell\qc -0.00628\cell\row
+\ql \cell\qc (0.0754)\cell\row
+\ql TAvg_lland_holding\cell\qc -14.32\cell\row
+\ql \cell\qc (19.73)\cell\row
+\ql TAvg_lreal_hhvalue\cell\qc 2.917\cell\row
+\ql \cell\qc (2.172)\cell\row
+\ql TAvg_soil_qty_rev2\cell\qc -10.35\cell\row
+\ql \cell\qc (7.580)\cell\row
+\ql TAvg_hh_headage\cell\qc 0.620\cell\row
+\ql \cell\qc (1.480)\cell\row
+\ql 2012.year\cell\qc 12.57\cell\row
+\ql \cell\qc (20.31)\cell\row
+\ql 2015.year\cell\qc 29.19\cell\row
+\ql \cell\qc (213.3)\cell\row
+\ql 2018.year\cell\qc 1.206\cell\row
+\ql \cell\qc (36.71)\cell\row
+\ql \cell\qc \cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx3456\clbrdrb\brdrs\cellx4896
+\ql Observations\cell\qc 2,960\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}

@@ -9,8 +9,6 @@ use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_pric
 
 tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
-*real_maize_price_mr real_rice_price_mr informal_save pry_edu finish_pry finish_sec net_seller net_buyer 
-
 
 misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region
 
@@ -53,14 +51,10 @@ program define myboot, rclass
 ** CRE-TOBIT
  preserve 
 
+ 
+
 
 heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch land_holding ext_acess formal_credit informal_credit year_2018  year_2021, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  land_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2018 year_2021) twostep
-
-
-
-* formal_credit informal_credit formal_credit informal_credit TAvg_formal_credit TAvg_informal_credit land_holding lland_holding TAvg_land_holding 
-
-*num_mem worker TAvg_num_mem TAvg_worker real_rice_price_mr TAvg_real_rice_price_mr
 
 
 predict yhat, xb
@@ -94,9 +88,9 @@ restore
 end
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_real_heckman_original.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_real_heckman_original.doc", replace word
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_nominal_heckman.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_nominal_heckman.doc", replace word
 
 
 *outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Logtrying_nominal_heckman.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace
@@ -138,9 +132,9 @@ end
 
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_real_heckman_original.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_real_heckman_original.doc", replace word
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_nominal_heckman.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_nominal_heckman.doc", replace word
 
 
 tabstat total_qty_w mrk_dist_w yhat real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
@@ -157,8 +151,6 @@ use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_heckman
 use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_heckman15.dta", clear
 
 tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-*real_maize_price_mr real_rice_price_mr informal_save pry_edu finish_pry finish_sec net_seller net_buyer 
 
 
 misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region
@@ -208,10 +200,10 @@ program define myboot, rclass
  preserve 
 
 
-heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch lland_holding ext_acess formal_credit informal_credit year_2013  year_2015, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  lland_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2013  year_2015) twostep
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr attend_sch land_holding ext_acess formal_credit informal_credit year_2013  year_2015, select (commercial_dummy= mrk_dist_w hh_headage  num_mem worker lreal_hhvalue  femhead ext_acess attend_sch  land_holding safety_net soil_qty_rev2 real_maize_price_mr formal_credit informal_credit num_mem worker year_2013  year_2015) twostep
 
 
-*soil_qty_rev2  lreal_hhvalue TAvg_soil_qty_rev2 TAvg_lreal_hhvalue
+
 
 predict yhat, xb
 
@@ -231,7 +223,7 @@ foreach x in `time_avg' {
 }
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w mrk_dist_w lyhat real_maize_price_mr hh_headage  lland_holding femhead ext_acess attend_sch  safety_net formal_credit informal_credit num_mem worker TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lyhat  TAvg_hh_headage  TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net  TAvg_real_maize_price_mr  TAvg_lland_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
+tobit ltotal_qty_w mrk_dist_w lyhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lyhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
 
 
 margins, predict(ystar(0,.)) dydx(*) post
@@ -242,7 +234,7 @@ bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_real_heckman_original15.doc", replace word
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log2_nominal_heckman15.doc",   replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Log_nominal_heckman15.doc",   replace word
 
 
 
@@ -273,7 +265,7 @@ foreach x in `time_avg' {
 
 }
 
-tobit total_qty_w mrk_dist_w yhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.region i.year, ll(0)
+tobit total_qty_w mrk_dist_w yhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
 
 
 
@@ -283,9 +275,9 @@ end
 
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_real_heckman_original15.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_real_heckman_original15.doc", replace word
 
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_nominal_heckman15.doc", title (Table 3: Elasticity) ctitle(Tobit) se label replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\results\Level_nominal_heckman15.doc", replace word
 
 
 tabstat total_qty_w mrk_dist_w yhat real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)

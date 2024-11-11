@@ -1,0 +1,83 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx3600\clbrdrt\brdrs\cellx5184
+\ql \cell\qc (1)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx3600\cellx5184
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx3600\clbrdrb\brdrs\cellx5184
+\ql VARIABLES\cell\qc y1\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx3600\cellx5184
+\ql \cell\qc \cell\row
+\ql lyhat\cell\qc -1.631*\cell\row
+\ql \cell\qc (0.950)\cell\row
+\ql subsidy_qty_w\cell\qc -0.00262\cell\row
+\ql \cell\qc (0.00191)\cell\row
+\ql dist_cens_w\cell\qc 0.00438\cell\row
+\ql \cell\qc (0.00282)\cell\row
+\ql femhead\cell\qc 0.179\cell\row
+\ql \cell\qc (0.123)\cell\row
+\ql ext_acess\cell\qc 0.0605\cell\row
+\ql \cell\qc (0.0709)\cell\row
+\ql attend_sch\cell\qc -0.285\cell\row
+\ql \cell\qc (0.247)\cell\row
+\ql hh_headage_mrk\cell\qc -0.0184***\cell\row
+\ql \cell\qc (0.00504)\cell\row
+\ql lreal_hhvalue\cell\qc 0.121***\cell\row
+\ql \cell\qc (0.0292)\cell\row
+\ql lfield_size_ha_w\cell\qc -0.0390\cell\row
+\ql \cell\qc (0.0496)\cell\row
+\ql real_maize_price_mr\cell\qc -0.000205\cell\row
+\ql \cell\qc (0.000453)\cell\row
+\ql real_rice_price_mr\cell\qc -4.01e-05\cell\row
+\ql \cell\qc (0.000186)\cell\row
+\ql safety_net\cell\qc -0.0264\cell\row
+\ql \cell\qc (0.108)\cell\row
+\ql soil_qty_rev2\cell\qc 0.103*\cell\row
+\ql \cell\qc (0.0551)\cell\row
+\ql num_mem\cell\qc -0.0890***\cell\row
+\ql \cell\qc (0.0229)\cell\row
+\ql worker\cell\qc 0.0730**\cell\row
+\ql \cell\qc (0.0367)\cell\row
+\ql TAvg_ltotal_qty_w\cell\qc 0.608***\cell\row
+\ql \cell\qc (0.0345)\cell\row
+\ql TAvg_subsidy_qty_w\cell\qc 0.00640**\cell\row
+\ql \cell\qc (0.00288)\cell\row
+\ql TAvg_dist_cens_w\cell\qc -0.00805*\cell\row
+\ql \cell\qc (0.00419)\cell\row
+\ql TAvg_lyhat\cell\qc 3.187*\cell\row
+\ql \cell\qc (1.785)\cell\row
+\ql TAvg_femhead\cell\qc -0.151\cell\row
+\ql \cell\qc (0.152)\cell\row
+\ql TAvg_ext_acess\cell\qc -0.123\cell\row
+\ql \cell\qc (0.125)\cell\row
+\ql TAvg_attend_sch\cell\qc 0.446\cell\row
+\ql \cell\qc (0.280)\cell\row
+\ql TAvg_hh_headage_mrk\cell\qc 0.0127**\cell\row
+\ql \cell\qc (0.00557)\cell\row
+\ql TAvg_lreal_hhvalue\cell\qc -0.117***\cell\row
+\ql \cell\qc (0.0376)\cell\row
+\ql TAvg_lfield_size_ha_w\cell\qc 0.0114\cell\row
+\ql \cell\qc (0.0624)\cell\row
+\ql TAvg_real_maize_price_mr\cell\qc -0.000190\cell\row
+\ql \cell\qc (0.000522)\cell\row
+\ql TAvg_real_rice_price_mr\cell\qc 0.000323\cell\row
+\ql \cell\qc (0.000300)\cell\row
+\ql TAvg_safety_net\cell\qc -0.0112\cell\row
+\ql \cell\qc (0.127)\cell\row
+\ql TAvg_soil_qty_rev2\cell\qc -0.209***\cell\row
+\ql \cell\qc (0.0751)\cell\row
+\ql TAvg_num_mem\cell\qc 0.0678***\cell\row
+\ql \cell\qc (0.0242)\cell\row
+\ql TAvg_worker\cell\qc 0.000893\cell\row
+\ql \cell\qc (0.0405)\cell\row
+\ql 2012.year\cell\qc -0.378\cell\row
+\ql \cell\qc (0.276)\cell\row
+\ql 2014.year\cell\qc -0.797***\cell\row
+\ql \cell\qc (0.269)\cell\row
+\ql 2020.year\cell\qc -0.861**\cell\row
+\ql \cell\qc (0.373)\cell\row
+\ql \cell\qc \cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx3600\clbrdrb\brdrs\cellx5184
+\ql Observations\cell\qc 1,748\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}

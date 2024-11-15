@@ -6,7 +6,7 @@
 
 
 *************************************************
-*Heckman 2018
+*Median 2018
 
 use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21.dta", clear
 use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21.dta", clear

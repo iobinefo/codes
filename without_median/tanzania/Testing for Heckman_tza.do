@@ -224,12 +224,14 @@ end
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
 
-tabstat total_qty_w subsidy_qty_w dist_cens_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker real_maize_price_mr real_rice_price_mr real_hhvalue field_size_ha_w [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\results\Level_real_median_original.doc", replace word
 
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\tanzania\results\Level_nominal_median.doc", replace word
+
+
+tabstat total_qty_w subsidy_qty_w dist_cens_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker real_maize_price_mr real_rice_price_mr real_hhvalue field_size_ha_w [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
 
 
 

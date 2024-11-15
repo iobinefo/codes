@@ -278,7 +278,8 @@ foreach x in `time_avg' {
 
 }
 
-tobit total_qty_w mrk_dist_w yhat real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2 num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding  TAvg_num_mem TAvg_worker i.year, ll(0)
+
+tobit total_qty_w mrk_dist_w yhat real_maize_price_mr hh_headage lreal_hhvalue lland_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_yhat  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_lland_holding TAvg_num_mem TAvg_worker i.year, ll(0)
 
 
 margins, predict(ystar(0,.)) dydx(*) post

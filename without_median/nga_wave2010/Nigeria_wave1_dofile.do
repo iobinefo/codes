@@ -51,6 +51,11 @@ save  "${Nigeria_GHS_W1_created_data}/weight.dta", replace
 *Geodata Variables
 ************************
 use "${Nigeria_GHS_W1_raw_data}\Geodata\NGA_PlotGeovariables_Y1.dta", clear
+
+collapse (max) srtmslp_nga srtm_nga twi_nga, by (hhid)
+
+merge 1:m hhid using "${Nigeria_GHS_W1_raw_data}\Geodata\NGA_HouseholdGeovariables_Y1.dta"
+
 merge m:1 hhid using "${Nigeria_GHS_W1_created_data}/ag_rainy_10.dta", gen(filter)
 
 keep if ag_rainy_10==1
@@ -58,19 +63,57 @@ keep if ag_rainy_10==1
 ren srtmslp_nga plot_slope
 ren srtm_nga  plot_elevation
 ren twi_nga   plot_wetness
+ren af_bio_12 annual_precipitation
+ren af_bio_1 annual_mean_temp
+ren dist_market dist_market
+
+
 
 tab1 plot_slope plot_elevation plot_wetness, missing
 
 egen med_slope = median( plot_slope)
 egen med_elevation = median( plot_elevation)
 egen med_wetness = median( plot_wetness)
+egen med_prep = median( annual_precipitation)
+egen med_temp = median( annual_mean_temp)
 
 replace plot_slope= med_slope if plot_slope==.
 replace plot_elevation= med_elevation if plot_elevation==.
 replace plot_wetness= med_wetness if plot_wetness==.
+replace annual_precipitation= med_prep if annual_precipitation==.
+replace annual_mean_temp= med_temp if annual_mean_temp==.
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
+sum annual_precipitation, detail
+sum annual_mean_temp, detail
+sum dist_market, detail
+
+
+collapse (max) plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market, by (hhid)
 sort hhid
+
+
+merge 1:1 hhid using  "${Nigeria_GHS_W1_created_data}/weight.dta", gen (wgt)
+merge 1:1 hhid using "${Nigeria_GHS_W1_created_data}/ag_rainy_10.dta", gen(filter)
+
+keep if ag_rainy_10==1
+
+************winzonrizing total_qty
+foreach v of varlist  dist_market  {
+	_pctile `v' [aw=weight] , p(1 99) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 1%"
+}
+
+
+tab dist_market
+tab dist_market_w, missing
+sum dist_market dist_market_w, detail
+
+keep hhid plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market_w
+
 la var plot_slope "slope of plot"
 la var plot_elevation "Elevation of plot"
 la var plot_wetness "Potential wetness index of plot"
@@ -106,9 +149,9 @@ label list institute2
 
 
 *************Getting Subsidized quantity and Dummy Variable ******************* we are using N2 and N3
-gen subsidy_qty1 = s11dq15 if institute ==6 | institute ==7
+gen subsidy_qty1 = s11dq15 if institute ==6 | institute ==7 //8 should be government extension worker
 tab subsidy_qty1
-gen subsidy_qty2 = s11dq26 if institute2 ==3 | institute2 ==4
+gen subsidy_qty2 = s11dq26 if institute2 ==3 | institute2 ==4 // 5 should be government extension worker
 tab subsidy_qty2
 
 
@@ -117,8 +160,8 @@ tab subsidy_qty,missing
 sum subsidy_qty,detail
 
 
-gen subsidy_dummy = 0
-replace subsidy_dummy = 1 if institute ==6 | institute ==7 |institute2 ==3 | institute2 ==4
+gen subsidy_dummy = (subsidy_qty !=0)
+
 tab subsidy_dummy, missing
 
 
@@ -159,13 +202,27 @@ label var subsidy_dummy "=1 if acquired any subsidied fertilizer"
 save "${Nigeria_GHS_W1_created_data}\subsidized_fert.dta", replace
 
 
+******************************* 
+*Seed
+*******************************
+
+ use "${Nigeria_GHS_W1_raw_data}\Post Planting Wave 1\Agriculture\sect11e_plantingw1.dta", clear
+ merge m:1 hhid using "${Nigeria_GHS_W1_created_data}/ag_rainy_10.dta", gen(filter)
+
+keep if ag_rainy_10==1
+ tab s11eq14, nolabel
+ gen seed_dummy = (s11eq14==1)
+ collapse (max) seed_dummy, by (hhid)
+ tab seed_dummy
+save "${Nigeria_GHS_W1_created_data}\seed.dta", replace
 
 
 ******************************* 
 *Purchased Fertilizer
 *******************************
 
-use "${Nigeria_GHS_W1_raw_data}\Post Planting Wave 1\Agriculture\sect11d_plantingw1.dta",clear 
+use "${Nigeria_GHS_W1_raw_data}\Post Planting Wave 1\Agriculture\sect11d_plantingw1.dta",clear
+
 merge m:1 hhid using "${Nigeria_GHS_W1_created_data}/ag_rainy_10.dta", gen(filter)
 
 keep if ag_rainy_10==1
@@ -176,7 +233,6 @@ keep if ag_rainy_10==1
 *s11dq40     		source of org purchased fertilizer (1=govt, 2=private)
 *s11dq15 s11dq26  qty of inorg purchased fertilizer
 *s11dq19  s11dq29	value of inorg purchased fertilizer
-
 
 
 
@@ -297,7 +353,7 @@ tab org_fert, missing
 
 
 
-collapse zone lga sector ea (sum) total_qty total_valuefert (max)  org_fert tpricefert_cens_mrk, by(hhid)
+collapse zone lga sector ea (sum) total_qty total_valuefert (max) org_fert tpricefert_cens_mrk, by(hhid)
 
 tab total_qty, missing
 tab tpricefert_cens_mrk, missing
@@ -339,7 +395,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 
 */
 *
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   //0.4164266
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   /0.4164266
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -945,11 +1001,11 @@ collapse  (max) maize_price_mr rice_price_mr net_seller net_buyer, by(hhid)
 
 
 
-gen rea_maize_price_mr = maize_price_mr  //0.4164266
+gen rea_maize_price_mr = maize_price_mr  /0.4164266
 gen real_maize_price_mr = rea_maize_price_mr
 tab real_maize_price_mr
 sum real_maize_price_mr, detail
-gen rea_rice_price_mr = rice_price_mr   //0.4164266
+gen rea_rice_price_mr = rice_price_mr   /0.4164266
 gen real_rice_price_mr = rea_rice_price_mr
 tab real_rice_price_mr
 sum real_rice_price_mr, detail
@@ -979,7 +1035,7 @@ keep if inlist(region,"SSF")
 	*does the same thing: keep if regioncode=="SSF"
 
 *keep our study countries
-keep if inlist(countrycode,"NGA")
+keep if inlist(countrycode,"MWI")
 	* does the same thing: drop if !(inlist(countrycode,"TZA"))
 
 
@@ -990,7 +1046,7 @@ drop yr1960-yr1989
 l countrycode yr2004-yr2017
 
 *rebase to 2015
-gen baseyear = yr2018
+gen baseyear = yr2019
 forvalues i=1990(1)2022 {
 	replace yr`i' = yr`i'/baseyear
 }
@@ -1005,7 +1061,7 @@ rename yr cpi
 keep countrycode countryname year cpi
 order countrycode countryname year cpi
 la var year "Year"
-la var cpi "CPI (base=2018)"
+la var cpi "CPI (base=2019)"
 
 
 *save for use in analysis
@@ -1106,7 +1162,7 @@ sum hhasset_value hhasset_value_w, detail
 
 *summarize  hhasset_value_w hhasset_value_s , detail
 
-gen rea_hhvalue = hhasset_value_w   //0.4164266
+gen rea_hhvalue = hhasset_value_w   /0.4164266
 gen real_hhvalue = rea_hhvalue/1000
 sum hhasset_value_w real_hhvalue, detail
 
@@ -1330,6 +1386,10 @@ sort hhid
 merge 1:1 hhid using "${Nigeria_GHS_W1_created_data}\geodata.dta"
 drop _merge
 sort hhid
+merge 1:1 hhid using "${Nigeria_GHS_W1_created_data}\seed.dta"
+drop _merge
+sort hhid
+
 merge 1:1 hhid using "C:\Users\obine\Music\Documents\Smallholder lsms STATA\analyzed_data\nga_wave2012\soil_quality_2012.dta"
 
 drop if _merge==2
@@ -1343,7 +1403,7 @@ order year
 
 
 
-tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w subsidy_qty_w dist_market_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 *soil_qty_rev2 soil_qty_rev2 hhasset_value
 
@@ -1364,6 +1424,7 @@ misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mr
 
 
 proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
+tab seed_dummy
 
-save "${Nigeria_GHS_W1_created_data}\Nigeria_wave1_complete_data.dta", replace
+save "${Nigeria_GHS_W1_created_data}\Nigeria_wave1_complete_datap.dta", replace
 

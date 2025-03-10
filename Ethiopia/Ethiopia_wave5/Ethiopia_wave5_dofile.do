@@ -30,44 +30,76 @@ save  "${Ethiopia_GHS_W5_created_data}/ag_rainy_21.dta", replace
 
 
 
-/*
 
 ************************
 *Geodata Variables
 ************************
 
-use "${Nigeria_GHS_W2_raw_data}\Geodata Wave 2\NGA_PlotGeovariables_Y2.dta", clear
+use "${Ethiopia_GHS_W5_raw_data}\sect3_pp_w5.dta",clear  
 
-merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/ag_rainy_12.dta", gen(filter)
+ren pw_w5  weight
 
-keep if ag_rainy_12==1
+collapse (max) weight, by (household_id)
+save  "${Ethiopia_GHS_W5_created_data}/weight.dta", replace
 
-merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/maize_12.dta", gen(maize)
 
-keep if maize_12==1
+merge 1:m household_id using  "${Ethiopia_GHS_W5_raw_data}\eth_plotgeovariables_y5.dta", gen(use)
 
-ren srtmslp_nga plot_slope
-ren srtm_nga  plot_elevation
-ren twi_nga   plot_wetness
+ren household_id hhid
+
+
+
+ren afmnslp_pct  plot_slope
+ren srtm_1k  plot_elevation
+ren twi_ne   plot_wetness
+ren af_bio_12_x  annual_precipitation
+ren af_bio_1_x  annual_mean_temp
+ren dist_market dist_admarc
+
+gen hh_slope =   plot_slope
+gen   hh_elevation = plot_elevation
+gen     hh_wetness = plot_wetness
+
+
 
 tab1 plot_slope plot_elevation plot_wetness, missing
+sum plot_slope hh_slope, detail
+sum plot_elevation hh_elevation, detail
+sum plot_wetness hh_wetness, detail
 
-/*egen med_slope = median( plot_slope)
-egen med_elevation = median( plot_elevation)
-egen med_wetness = median( plot_wetness)
 
-replace plot_slope= med_slope if plot_slope==.
-replace plot_elevation= med_elevation if plot_elevation==.
-replace plot_wetness= med_wetness if plot_wetness==.*/
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
+
+sum plot_slope, detail
+sum annual_precipitation, detail
+sum dist_admarc, detail
+
+collapse (max) weight plot_slope plot_elevation plot_wetness hh_slope hh_elevation hh_wetness annual_precipitation annual_mean_temp dist_admarc, by (hhid)
 sort hhid
+
+*ren household_id hhid
+merge m:1 hhid using "${Ethiopia_GHS_W5_created_data}/ag_rainy_21.dta", gen(filter)
+
+keep if ag_rainy_21==1
+************winzonrizing fertilizer market price
+foreach v of varlist  dist_admarc  {
+	_pctile `v' [aw=weight] , p(5 95) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 1%"
+}
+
+sum dist_admarc dist_admarc_w, detail
+
+keep hhid plot_slope plot_elevation plot_wetness  hh_slope hh_elevation hh_wetness annual_precipitation annual_mean_temp dist_admarc_w
+
 la var plot_slope "slope of plot"
 la var plot_elevation "Elevation of plot"
 la var plot_wetness "Potential wetness index of plot"
-save "${Nigeria_GHS_W2_created_data}\geodata_2012.dta", replace
+save "${Ethiopia_GHS_W5_raw_data}\geodata_2021.dta", replace
 
-*/
 
 
 
@@ -119,7 +151,7 @@ sum tpricefert, detail
 
 
 gen tpricefert_cens = tpricefert
-replace tpricefert_cens = 80 if tpricefert_cens > 80 & tpricefert_cens < . //winzorizing at bottom 1%
+replace tpricefert_cens = 650 if tpricefert_cens > 650 & tpricefert_cens < . //winzorizing at bottom 1%
 *replace tpricefert_cens = 1 if tpricefert_cens < 1
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
@@ -195,7 +227,14 @@ tab tpricefert_cens_mrk,missing
 */
 ren pw_w5 weight
 
-collapse region zone woreda ea (sum) total_qty total_valuefert (max) weight tpricefert_cens_mrk, by(hhid)
+tab s3q25
+tab s3q26
+tab s3q27
+
+gen org_fert = (s3q25==1 | s3q26 ==1 | s3q27==1)
+tab org_fert
+
+collapse region zone woreda ea (sum) total_qty total_valuefert (max) org_fert weight tpricefert_cens_mrk, by(hhid)
 
 
 merge m:1 hhid using "${Ethiopia_GHS_W5_created_data}/ag_rainy_21.dta", gen(filter)
@@ -205,6 +244,13 @@ keep if ag_rainy_21==1
 
 sum tpricefert_cens_mrk, detail
 
+
+replace total_qty = 5150 if total_qty > 5150
+
+ren total_qty total_qty_w
+
+
+/*
 ************winzonrizing total_qty
 foreach v of varlist  total_qty  {
 	_pctile `v' [aw=weight] , p(1 99) 
@@ -219,7 +265,7 @@ foreach v of varlist  total_qty  {
 tab total_qty
 tab total_qty_w, missing
 sum total_qty total_qty_w, detail
-
+*/
 
 /*
 
@@ -241,7 +287,7 @@ tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
 
 
-keep hhid region zone woreda ea total_qty_w total_valuefert real_tpricefert_cens_mrk
+keep hhid region zone woreda ea total_qty_w total_valuefert real_tpricefert_cens_mrk org_fert
 
 
 
@@ -252,47 +298,38 @@ sort hhid
 save "${Ethiopia_GHS_W5_created_data}\purchased_fert_2021.dta", replace
 
 
-/*
+
 ************************************************
 *Savings 
 ************************************************
-
-use "${Ethiopia_GHS_W4_raw_data}/sect5a_hh_w4.dta", clear
-
-
-
-ren household_id2 hhid
-merge m:1 hhid using "${Ethiopia_GHS_W2_created_data}/ag_rainy_13.dta", gen(filter)
-
-keep if ag_rainy_13==1
-*s4aq1  1= formal bank
-*s4aq9b s4aq9d s4aq9f  types of formal fin institute used to save money
-*s4aq10 1= informal saving
+use "C:\Users\obine\Music\Documents\Smallholder lsms STATA\Ethiopia\ETH_2018_ESS_v03_M_Stata\sect5a_hh_w4.dta" , clear
 
 
 
-ren s4aq1 formal_bank
+ren household_id hhid
+merge m:1 hhid using "${Ethiopia_GHS_W5_created_data}/ag_rainy_21.dta", gen(filter)
+
+keep if ag_rainy_21==1
+
+
+
+gen formal_bank = (s5aq06__1==1 | s5aq06__2==1 | s5aq06__3==1)
 tab formal_bank, missing
-replace formal_bank =0 if formal_bank ==2 | formal_bank ==.
-tab formal_bank, nolabel
-tab formal_bank,missing
 
- gen formal_save = 1 if s4aq9b !=. | s4aq9d !=.| s4aq9f !=.
- tab formal_save, missing
- replace formal_save = 0 if formal_save ==.
+
+ gen formal_save = (s5aq11__1 ==1 | s5aq11__2 ==1 | s5aq11__3 ==1)
  tab formal_save, missing
 
- ren s4aq10 informal_save
+gen informal_save = (s5aq13__1 ==1 | s5aq13__2  ==1 | s5aq13__3 ==1 | s5aq13__4 ==1 | s5aq13__5 ==1 )
  tab informal_save, missing
- replace informal_save =0 if informal_save ==2 | informal_save ==.
- tab informal_save, missing
+
 
  collapse (max) formal_bank formal_save informal_save, by (hhid)
  la var formal_bank "=1 if respondent have an account in bank"
  la var formal_save "=1 if used formal saving group"
  la var informal_save "=1 if used informal saving group"
-save "${Nigeria_GHS_W2_created_data}\savings_2012.dta", replace
-*/
+save "${Ethiopia_GHS_W5_created_data}\savings_2021.dta", replace
+
 
 
 
@@ -722,12 +759,15 @@ ren saq01 region
 
 tab cs10bq02  if cs10bq02 ==4
 tab cs10bq02  if cs10bq02 ==5
+tab cs10bq02  if cs10bq02 ==1
 
 
 tab cs10bq03 if cs10bq02 ==4 //maize
 tab cs10bq03 if cs10bq02 ==4, nolabel
 tab cs10bq03 if cs10bq02 ==5  //sorghum
 tab cs10bq03 if cs10bq02 ==5, nolabel
+tab cs10bq03 if cs10bq02 ==1  //sorghum
+tab cs10bq03 if cs10bq02 ==1, nolabel
 
 
 sum cs10bq05 if cs10bq02 ==4, detail
@@ -823,20 +863,20 @@ sum maize_price, detail
 ****************
 *rice price
 ***************
-tab cs10bq03 if cs10bq02 ==5  //sorghum
-tab cs10bq03 if cs10bq02 ==5, nolabel
+tab cs10bq03 if cs10bq02 ==1  //sorghum
+tab cs10bq03 if cs10bq02 ==1, nolabel
 
 
-sum cs10bq05 if cs10bq02 ==5, detail
-
-
-
+sum cs10bq05 if cs10bq02 ==1, detail
 
 
 
 
 
-gen rice_price=cs10bq05  if  cs10bq02 ==5 & cs10bq03==1
+
+
+
+gen rice_price=cs10bq05  if  cs10bq02 ==1 & cs10bq03==1
 
 */
 
@@ -1476,9 +1516,9 @@ use "${Ethiopia_GHS_W5_created_data}\purchased_fert_2021.dta", replace
 
 
 
-*merge 1:1 hhid using "${Ethiopia_GHS_W2_created_data}\savings_2012.dta"
-*drop _merge
-*sort hhid
+merge 1:1 hhid using "${Ethiopia_GHS_W5_created_data}\savings_2021.dta"
+drop _merge
+sort hhid
 merge 1:1 hhid using "${Ethiopia_GHS_W5_created_data}\credit_2021.dta"
 drop _merge
 sort hhid
@@ -1497,9 +1537,9 @@ sort hhid
 merge 1:1 hhid using "${Ethiopia_GHS_W5_created_data}\food_prices_2021.dta"
 drop _merge
 sort hhid
-*merge 1:1 hhid using "${Ethiopia_GHS_W2_created_data}\geodata_2013.dta"
-*drop _merge
-*sort hhid
+merge 1:1 hhid using "${Ethiopia_GHS_W5_raw_data}\geodata_2021.dta"
+drop _merge
+sort hhid
 merge 1:1 hhid using "${Ethiopia_GHS_W5_created_data}\soil_quality_2021.dta"
 drop _merge
 sort hhid
@@ -1532,15 +1572,30 @@ egen median_age = median(hh_headage)
 replace hh_headage= median_age if hh_headage==.
 
 egen median_soil = median(soil_qty_rev2)
+egen med_soil_ea = median(soil_qty_rev2), by (ea)
+egen med_soil_woreda = median(soil_qty_rev2), by (woreda)
+egen med_soil_zone = median(soil_qty_rev2), by (zone)
+egen med_soil_region = median(soil_qty_rev2), by (region)
+
+replace soil_qty_rev2= med_soil_ea if soil_qty_rev2==.
+
+replace soil_qty_rev2= med_soil_woreda if soil_qty_rev2==.
+
+replace soil_qty_rev2= med_soil_zone if soil_qty_rev2==.
+
+replace soil_qty_rev2= med_soil_region if soil_qty_rev2==.
+
+replace soil_qty_rev2= median_soil if soil_qty_rev2==.
+
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
 
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert
 
 
 
 
-save "${Ethiopia_GHS_W5_created_data}\Ethiopia_wave5_complete_data.dta", replace
+save "${Ethiopia_GHS_W5_created_data}\Ethiopia_wave5_complete_datap.dta", replace
 
 
 
@@ -1549,8 +1604,8 @@ save "${Ethiopia_GHS_W5_created_data}\Ethiopia_wave5_complete_data.dta", replace
 
 
 *****************Appending all Nigeria Datasets*****************
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Ethiopia_wave4\Ethiopia_wave4_complete_data.dta",clear
-append using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Ethiopia_wave5\Ethiopia_wave5_complete_data.dta" 
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Ethiopia_wave4\Ethiopia_wave4_complete_datap.dta",clear
+append using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Ethiopia_wave5\Ethiopia_wave5_complete_datap.dta" 
 
 order year
 
@@ -1559,11 +1614,11 @@ order year
 
 tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert
 
 sum real_tpricefert_cens_mrk, detail
 
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_price21.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price21p.dta", replace
 
 
 

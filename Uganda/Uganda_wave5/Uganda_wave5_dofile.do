@@ -48,44 +48,43 @@ save  "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", replace
 
 
 
-/*
 
-************************
-*Geodata Variables
-************************
 
-use "${Nigeria_GHS_W2_raw_data}\Geodata Wave 2\NGA_PlotGeovariables_Y2.dta", clear
 
-merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/ag_rainy_12.dta", gen(filter)
 
-keep if ag_rainy_12==1
 
-merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/maize_12.dta", gen(maize)
 
-keep if maize_12==1
+*********************************************** 
+*seed
+***********************************************
 
-ren srtmslp_nga plot_slope
-ren srtm_nga  plot_elevation
-ren twi_nga   plot_wetness
+use "${Uganda_GHS_W5_raw_data}\AGSEC4A.dta",clear 
 
-tab1 plot_slope plot_elevation plot_wetness, missing
+duplicates report HHID  plotID
 
-/*egen med_slope = median( plot_slope)
-egen med_elevation = median( plot_elevation)
-egen med_wetness = median( plot_wetness)
+gen seed_dummy = ( a4aq13==2)
+collapse (max) seed_dummy, by (HHID plotID)
 
-replace plot_slope= med_slope if plot_slope==.
-replace plot_elevation= med_elevation if plot_elevation==.
-replace plot_wetness= med_wetness if plot_wetness==.*/
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
-sort hhid
-la var plot_slope "slope of plot"
-la var plot_elevation "Elevation of plot"
-la var plot_wetness "Potential wetness index of plot"
-save "${Nigeria_GHS_W2_created_data}\geodata_2012.dta", replace
+merge 1:m HHID  plotID using "${Uganda_GHS_W5_raw_data}\AGSEC4B.dta", gen(fert)
 
-*/
+merge m:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter)
+
+keep if filter==3
+
+keep if ag_rainy_15==1
+
+tab a4bq13, nolabel
+
+replace seed_dummy = 1 if a4bq13==2
+
+collapse (max) seed_dummy, by (HHID)
+
+la var seed_dummy "=1 improved seed"
+
+
+
+save "${Uganda_GHS_W5_created_data}\seed.dta", replace
 
 
 
@@ -124,6 +123,10 @@ keep if ag_rainy_15==1
 *pp_s3q20c  	value commercial urea
 
 
+*a3aq4
+
+
+
 sum a3aq17, detail
 sum a3bq17, detail
 
@@ -150,8 +153,8 @@ tab tpricefert
 sum tpricefert, detail
 
 gen tpricefert_cens = tpricefert
-replace tpricefert_cens = 30000 if tpricefert_cens > 30000 & tpricefert_cens < . //winzorizing at bottom 10%
-*replace tpricefert_cens =533 if tpricefert_cens < 533
+replace tpricefert_cens =  30000 if tpricefert_cens > 30000 & tpricefert_cens < . //winzorizing at bottom 10%
+*replace tpricefert_cens =1785 if tpricefert_cens < 1785
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
 replace tpricefert_cens=0 if tpricefert_cens==.
@@ -211,7 +214,13 @@ tab tpricefert_cens_mrk,missing
 
 tab total_qty, missing
 
-collapse (sum) total_qty total_valuefert (max) tpricefert_cens_mrk, by(HHID)
+tab a3aq4, nolabel
+
+gen org_fert = (a3aq4==1 )
+replace org_fert =1 if a3bq4==1
+tab org_fert
+
+collapse (sum) total_qty total_valuefert (max) org_fert tpricefert_cens_mrk, by(HHID)
 
 
 merge 1:1 HHID using "${Uganda_GHS_W5_created_data}/ag_rainy_15.dta", gen(filter)
@@ -263,7 +272,7 @@ tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
 
 
-keep HHID total_qty_w total_valuefert real_tpricefert_cens_mrk
+keep HHID total_qty_w total_valuefert real_tpricefert_cens_mrk org_fert
 
 
 
@@ -1080,7 +1089,10 @@ tab hhasset_value_w, missing
 sum hhasset_value hhasset_value_w, detail
 
 
-gen real_hhvalue = hhasset_value_w  // 0.8762497
+
+gen rea_hhvalue = hhasset_value_w  // 0.8762497
+gen real_hhvalue = rea_hhvalue 
+
 sum hhasset_value_w real_hhvalue, detail
 
 
@@ -1408,10 +1420,10 @@ drop _merge
 sort HHID
 merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\food_prices_2015.dta"
 drop _merge
-*sort HHID
-*merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\geodata_2015.dta"
-*drop _merge
-*sort HHID
+sort HHID
+merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\seed.dta"
+drop _merge
+sort HHID
 merge 1:1 HHID using "${Uganda_GHS_W5_created_data}\soil_quality_2015.dta"
 drop _merge
 sort HHID
@@ -1433,7 +1445,7 @@ gen year = 2015
 
 
 
-tabstat total_qty_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr  mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr  mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding seed org_fert [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 * pry_edu finish_pry finish_sec 
 
@@ -1458,15 +1470,17 @@ egen median_qty = median(total_qty_w)
 replace total_qty_w= median_qty if total_qty_w==.
 
 replace real_tpricefert_cens_mrk= 0 if real_tpricefert_cens_mrk==.
+replace seed_dummy = 0 if seed_dummy ==.
+replace org_fert = 0 if org_fert==.
 
-misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer safety_net
+misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer safety_net seed org_fert
 
 
 *credit formal_save informal_save safety_net
 sum total_qty_w, detail
 sum real_tpricefert_cens_mrk, detail
 
-save "${Uganda_GHS_W5_created_data}\Uganda_wave5_complete_data.dta", replace
+save "${Uganda_GHS_W5_created_data}\Uganda_wave5_complete_datapn.dta", replace
 
 
 

@@ -1,0 +1,103 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx4320\clbrdrt\brdrs\cellx5760
+\ql \cell\qc (1)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx4320\cellx5760
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx4320\clbrdrb\brdrs\cellx5760
+\ql VARIABLES\cell\qc y1\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx4320\cellx5760
+\ql \cell\qc \cell\row
+\ql real_tpricefert_cens_mrk\cell\qc 0.201***\cell\row
+\ql \cell\qc (0.0215)\cell\row
+\ql subsidy_qty_w\cell\qc -0.297***\cell\row
+\ql \cell\qc (0.0359)\cell\row
+\ql dist_admarc_w\cell\qc 0.862\cell\row
+\ql \cell\qc (0.963)\cell\row
+\ql maize_price_mr\cell\qc 0.0135\cell\row
+\ql \cell\qc (0.0186)\cell\row
+\ql ext_access\cell\qc 8.345***\cell\row
+\ql \cell\qc (3.037)\cell\row
+\ql attend_sch\cell\qc 16.60\cell\row
+\ql \cell\qc (11.49)\cell\row
+\ql femhead\cell\qc -10.97\cell\row
+\ql \cell\qc (8.810)\cell\row
+\ql safety_net\cell\qc 3.218\cell\row
+\ql \cell\qc (3.215)\cell\row
+\ql lland_holding\cell\qc 29.03***\cell\row
+\ql \cell\qc (2.828)\cell\row
+\ql lhhasset_value_w\cell\qc -0.838\cell\row
+\ql \cell\qc (4.159)\cell\row
+\ql hh_headage_mrk\cell\qc 0.0437\cell\row
+\ql \cell\qc (0.325)\cell\row
+\ql worker\cell\qc -0.897\cell\row
+\ql \cell\qc (1.749)\cell\row
+\ql num_mem\cell\qc 0.881\cell\row
+\ql \cell\qc (1.221)\cell\row
+\ql soil_qty_rev2\cell\qc -5.625***\cell\row
+\ql \cell\qc (2.070)\cell\row
+\ql org_fert\cell\qc -3.405\cell\row
+\ql \cell\qc (3.691)\cell\row
+\ql annual_precipitation\cell\qc -0.103**\cell\row
+\ql \cell\qc (0.0521)\cell\row
+\ql annual_mean_temp\cell\qc -0.189\cell\row
+\ql \cell\qc (0.498)\cell\row
+\ql plot_slope\cell\qc 0.0276\cell\row
+\ql \cell\qc (0.0216)\cell\row
+\ql plot_elevation\cell\qc 0.0282\cell\row
+\ql \cell\qc (0.0212)\cell\row
+\ql plot_wetness\cell\qc -0.460\cell\row
+\ql \cell\qc (0.601)\cell\row
+\ql TAvg_plot_slope\cell\qc -0.0272\cell\row
+\ql \cell\qc (0.0352)\cell\row
+\ql TAvg_plot_elevation\cell\qc -0.0412\cell\row
+\ql \cell\qc (0.0255)\cell\row
+\ql TAvg_plot_wetness\cell\qc 0.417\cell\row
+\ql \cell\qc (0.923)\cell\row
+\ql TAvg_annual_precipitation\cell\qc 0.102*\cell\row
+\ql \cell\qc (0.0524)\cell\row
+\ql TAvg_annual_mean_temp\cell\qc -0.268\cell\row
+\ql \cell\qc (0.532)\cell\row
+\ql TAvg_org_fert\cell\qc 12.26*\cell\row
+\ql \cell\qc (6.257)\cell\row
+\ql TAvg_soil_qty_rev2\cell\qc 0.862\cell\row
+\ql \cell\qc (3.780)\cell\row
+\ql TAvg_total_qty_w\cell\qc 0.494***\cell\row
+\ql \cell\qc (0.0133)\cell\row
+\ql TAvg_real_tpricefert_cens_mrk\cell\qc -0.0574\cell\row
+\ql \cell\qc (0.0456)\cell\row
+\ql TAvg_subsidy_qty_w\cell\qc 0.242***\cell\row
+\ql \cell\qc (0.0615)\cell\row
+\ql TAvg_dist_admarc_w\cell\qc -1.026\cell\row
+\ql \cell\qc (1.010)\cell\row
+\ql TAvg_maize_price_mr\cell\qc 0.0701\cell\row
+\ql \cell\qc (0.0449)\cell\row
+\ql TAvg_ext_access\cell\qc -11.85**\cell\row
+\ql \cell\qc (5.950)\cell\row
+\ql TAvg_femhead\cell\qc 1.019\cell\row
+\ql \cell\qc (9.429)\cell\row
+\ql TAvg_attend_sch\cell\qc 26.83\cell\row
+\ql \cell\qc (19.05)\cell\row
+\ql TAvg_safety_net\cell\qc -6.058\cell\row
+\ql \cell\qc (5.574)\cell\row
+\ql TAvg_lhhasset_value_w\cell\qc 1.144\cell\row
+\ql \cell\qc (5.585)\cell\row
+\ql TAvg_lland_holding\cell\qc -23.14***\cell\row
+\ql \cell\qc (3.703)\cell\row
+\ql TAvg_hh_headage_mrk\cell\qc -0.297\cell\row
+\ql \cell\qc (0.347)\cell\row
+\ql TAvg_worker\cell\qc 1.860\cell\row
+\ql \cell\qc (2.352)\cell\row
+\ql TAvg_num_mem\cell\qc -0.983\cell\row
+\ql \cell\qc (1.539)\cell\row
+\ql 2013.year\cell\qc -63.64***\cell\row
+\ql \cell\qc (9.609)\cell\row
+\ql 2016.year\cell\qc -80.75***\cell\row
+\ql \cell\qc (12.33)\cell\row
+\ql 2019.year\cell\qc -85.04***\cell\row
+\ql \cell\qc (15.69)\cell\row
+\ql \cell\qc \cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx4320\clbrdrb\brdrs\cellx5760
+\ql Observations\cell\qc 3,192\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}

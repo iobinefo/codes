@@ -1,26 +1,14 @@
 
-*Median
-use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", clear
-use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
-
-
-
-
-**********************************************
+*************************************************************************************************************************************************************
 
 *Heckman Log
 use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckman.dta", clear
 use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckman.dta", clear
 
-
-
-
-
-
 tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 egen med_zone = median (zone)
 replace zone = med_zone if zone ==.
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 zone year
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 zone year plot_elevation plot_slope plot_wetness dist_market_w annual_mean_temp annual_precipitation org_fert
 
 
 *replace hh_headage = 72 if hh_headage >72
@@ -31,7 +19,7 @@ gen lreal_hhvalue = log(real_hhvalue + 1)
 sum real_tpricefert_cens_mrk, detail
 
 
-local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 lland_holding lreal_hhvalue"
+local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 lland_holding lreal_hhvalue plot_elevation plot_slope plot_wetness annual_mean_temp annual_precipitation org_fert dist_market_w formal_bank formal_save"
 
 foreach x in `time_avg' {
 
@@ -40,14 +28,20 @@ foreach x in `time_avg' {
 }
 
 
+
+
+********************************************Instrumental Variables******************************************************************************************
+*************************************************************************************************************************************************************
+
 capture program drop myboot	
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
+ 
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue org_fert worker  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue org_fert worker soil_qty_rev2  i.year) twostep
 
   
- heckman real_tpricefert_cens_mrk subsidy_qty_w hh_headage mrk_dist_w real_maize_price_mr real_rice_price_mr lland_holding ext_acess   year_2010 year_2012 year_2015 year_2018, select (commercial_dummy= mrk_dist_w subsidy_qty_w  hh_headage lreal_hhvalue real_maize_price_mr real_rice_price_mr lland_holding femhead ext_acess attend_sch safety_net soil_qty_rev2  year_2010 year_2012 year_2015 year_2018) twostep
-
+  
 
 predict yhat, xb
 
@@ -59,10 +53,6 @@ gen lyhat = log(yhat)
 
 gen ltotal_qty_w = log(total_qty_w + 1)
 
-*histogram total_qty_w, width(50) frequency normal
-*histogram ltotal_qty_w, width(5) frequency normal
-
-
 local time_avg "lyhat ltotal_qty_w"
 
 foreach x in `time_avg' {
@@ -71,9 +61,9 @@ foreach x in `time_avg' {
 
 }
 
-
+ 
 ** CRE-TOBIT 
-tobit ltotal_qty_w lyhat subsidy_qty_w mrk_dist_w  ext_acess attend_sch safety_net femhead real_rice_price_mr lland_holding lreal_hhvalue soil_qty_rev2 hh_headage TAvg_ltotal_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_lyhat TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_femhead  TAvg_real_rice_price_mr TAvg_lland_holding TAvg_lreal_hhvalue TAvg_soil_qty_rev2 TAvg_hh_headage i.year, ll(0)
+tobit ltotal_qty_w lyhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker seed_dummy formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_lreal_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_worker TAvg_org_fert  TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_seed_dummy TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
 
 margins, predict(ystar(0,.)) dydx(*) post
 
@@ -86,50 +76,16 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\compl
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Log_nominal_heckman.doc", replace word
 
 
-**********************************************
-
-*Heckman level
-use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckman.dta", clear
-use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckman.dta", clear
 
 
-
-
-
-
-tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-egen med_zone = median (zone)
-replace zone = med_zone if zone ==.
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 zone year
-
-
-gen lland_holding = log(land_holding)
-gen lreal_hhvalue = log(real_hhvalue + 1)
-
-
-sum real_tpricefert_cens_mrk, detail
-
-
-local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 lland_holding lreal_hhvalue"
-
-foreach x in `time_avg' {
-
-	bysort hhid : egen TAvg_`x' = mean(`x')
-
-}
-
-*************Model sig
-
-
-
+**************LEVEL
 capture program drop myboot	
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
 
 
-
- heckman real_tpricefert_cens_mrk subsidy_qty_w hh_headage mrk_dist_w real_maize_price_mr real_rice_price_mr lland_holding ext_acess   year_2010 year_2012 year_2015 year_2018, select (commercial_dummy= mrk_dist_w subsidy_qty_w  hh_headage lreal_hhvalue real_maize_price_mr real_rice_price_mr lland_holding femhead ext_acess attend_sch safety_net soil_qty_rev2  year_2010 year_2012 year_2015 year_2018) twostep
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue org_fert worker  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue org_fert worker soil_qty_rev2  i.year) twostep
 
 
 predict yhat, xb
@@ -147,7 +103,7 @@ foreach x in `time_avg' {
 
 
 ** CRE-TOBIT 
-tobit total_qty_w yhat subsidy_qty_w mrk_dist_w  ext_acess attend_sch safety_net femhead real_rice_price_mr lland_holding lreal_hhvalue soil_qty_rev2 hh_headage TAvg_total_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_femhead  TAvg_real_rice_price_mr TAvg_lland_holding TAvg_lreal_hhvalue TAvg_soil_qty_rev2 TAvg_hh_headage i.year, ll(0)
+tobit total_qty_w yhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker  formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  TAvg_total_qty_w TAvg_yhat TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_lreal_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_worker TAvg_org_fert  TAvg_annual_mean_temp TAvg_annual_precipitation  TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
 
 
 margins, predict(ystar(0,.)) dydx(*) post
@@ -161,44 +117,131 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\compl
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Level__nominal_heckman.doc", replace word
 
 
-tabstat total_qty_w subsidy_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w yhat num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
 
 
-/*
-est drop _all
-reg treat age female education_dummy hhsize hhsize04 hhsickeye incomehh_w biofknow breadl7dbuyprice breadl7dbuynum ikotunmkt, robust
-est store m1
-esttab m* using "C:\Users\USER\OneDrive\Desktop\OFSP 11\Table01.regression.rtf", label replace cells(b(star fmt(%9.2f)) se(par fmt(%9.2f))) 
-estat ovtest
+*****************Using both organic fertilizer and soil quality as Instrumental Variables********************************************************************
+*************************************************************************************************************************************************************
 
-*export table
-esttab m* using "C:\Users\USER\OneDrive\Desktop\OFSP 11\Table33.regression.rtf", label replace cells(b(star fmt(%9.0f)) se(par fmt(%9.0f)))
-
-*/
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w  real_maize_price_mr real_rice_price_mr lland_holding   formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue  worker  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding   formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue worker org_fert soil_qty_rev2  i.year) twostep
+predict yhat, xb
 
 
+sum yhat, detail
+gen lyhat = log(yhat)
+gen ltotal_qty_w = log(total_qty_w + 1)
+local time_avg "lyhat ltotal_qty_w yhat"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+tobit ltotal_qty_w lyhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit   annual_mean_temp annual_precipitation  TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_market_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_lreal_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_worker   TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Log_real_heckman_organic.doc", replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Log_nominal_heckman_organic.doc", replace word
 
 
 
 
+***************LEVEL************
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue worker  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue org_fert worker soil_qty_rev2  i.year) twostep
+predict yhat, xb
+*sum yhat, detail
+
+local time_avg "yhat"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+tobit total_qty_w yhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker  formal_credit informal_credit annual_mean_temp annual_precipitation  TAvg_total_qty_w TAvg_yhat TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_lreal_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_worker  TAvg_annual_mean_temp TAvg_annual_precipitation  TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Level__heckman_organic.doc", replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Level__nominal_heckman_organic.doc", replace word
 
 
+tabstat total_qty_w yhat [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
+
+
+
+*********************************************************Using OLS Regression******************************************************************************
+*************************************************************************************************************************************************************
+
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w  real_maize_price_mr real_rice_price_mr lland_holding   formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue  worker  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding   formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue worker org_fert soil_qty_rev2  i.year) twostep
+predict yhat, xb
+
+
+sum yhat, detail
+gen lyhat = log(yhat)
+gen ltotal_qty_w = log(total_qty_w + 1)
+local time_avg "lyhat ltotal_qty_w yhat"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+xtreg ltotal_qty_w lyhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit   annual_mean_temp annual_precipitation i.year,  fe i(hhid)
+restore
+end
+bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Log_real_heckman_organic.doc", replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Log_nominal_heckman_organic.doc", replace word
+
+
+
+
+***************LEVEL************
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue worker  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  informal_save formal_credit informal_credit  ext_acess attend_sch  hh_headage femhead num_mem safety_net lreal_hhvalue org_fert worker soil_qty_rev2  i.year) twostep
+predict yhat, xb
+*sum yhat, detail
+
+local time_avg "yhat"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+xtreg total_qty_w yhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker  formal_credit informal_credit annual_mean_temp annual_precipitation i.year, fe i(hhid)
+restore
+end
+bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Level__heckman_organic.doc", replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Level__nominal_heckman_organic.doc", replace word
+
+
+tabstat total_qty_w yhat [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
 
 
 
@@ -207,7 +250,19 @@ use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.
 use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
 
 
+foreach v of varlist  real_tpricefert_cens_mrk  {
+	_pctile `v' [aw=weight] , p(1 99) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 1%"
+}
 
+
+tab real_tpricefert_cens_mrk
+tab real_tpricefert_cens_mrk_w, missing
+sum real_tpricefert_cens_mrk real_tpricefert_cens_mrk_w, detail
 
 tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 egen med_zone = median (zone)
@@ -222,7 +277,8 @@ gen lreal_hhvalue = log(real_hhvalue + 1)
 sum real_tpricefert_cens_mrk, detail
 
 
-local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 lland_holding lreal_hhvalue"
+local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 lland_holding lreal_hhvalue plot_elevation plot_slope plot_wetness annual_mean_temp annual_precipitation org_fert dist_market_w formal_bank formal_save"
+
 
 foreach x in `time_avg' {
 
@@ -231,6 +287,31 @@ foreach x in `time_avg' {
 }
 
 
+gen lreal_tpricefert_cens_mrk = log(real_tpricefert_cens_mrk)
+
+gen ltotal_qty_w = log(total_qty_w + 1)
+
+local time_avg "lreal_tpricefert_cens_mrk ltotal_qty_w"
+
+foreach x in `time_avg' {
+
+	bysort hhid : egen TAvg_`x' = mean(`x')
+
+}
+
+*log
+** OLS with HH fixed effects
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  i.zone i.year, fe i(hhid) cluster(hhid)
+
+** OLS with HH fixed effects
+xtreg total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  i.zone i.year, fe i(hhid) cluster(hhid)
+
+tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
 
 capture program drop myboot	
 program define myboot, rclass
@@ -239,8 +320,9 @@ preserve
 
 
 ** CRE-TOBIT 
+tobit total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_lreal_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_worker TAvg_org_fert  TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
 
-tobit total_qty_w real_tpricefert_cens_mrk subsidy_qty_w mrk_dist_w  ext_acess attend_sch safety_net femhead real_rice_price_mr lland_holding lreal_hhvalue soil_qty_rev2 hh_headage TAvg_total_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_real_tpricefert_cens_mrk TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_femhead  TAvg_real_rice_price_mr TAvg_lland_holding TAvg_lreal_hhvalue TAvg_soil_qty_rev2 TAvg_hh_headage i.year, ll(0)
+
 
 margins, predict(ystar(0,.)) dydx(*) post
 
@@ -257,63 +339,7 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\compl
 tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 *Log
-use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", clear
-use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
-
-
-
-
-tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-egen med_zone = median (zone)
-replace zone = med_zone if zone ==.
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 zone year
-
-
-gen lland_holding = log(land_holding)
-gen lreal_hhvalue = log(real_hhvalue + 1)
-
-
-sum real_tpricefert_cens_mrk, detail
-
-
-local time_avg "total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 lland_holding lreal_hhvalue"
-
-foreach x in `time_avg' {
-
-	bysort hhid : egen TAvg_`x' = mean(`x')
-
-}
-
-gen lreal_tpricefert_cens_mrk = log(real_tpricefert_cens_mrk)
-
-gen ltotal_qty_w = log(total_qty_w + 1)
-
-local time_avg "lreal_tpricefert_cens_mrk ltotal_qty_w"
-
-foreach x in `time_avg' {
-
-	bysort hhid : egen TAvg_`x' = mean(`x')
-
-}
-
-
 
 capture program drop myboot	
 program define myboot, rclass
@@ -322,7 +348,7 @@ program define myboot, rclass
 
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w mrk_dist_w  ext_acess attend_sch safety_net femhead real_rice_price_mr lland_holding lreal_hhvalue soil_qty_rev2 hh_headage TAvg_ltotal_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_lreal_tpricefert_cens_mrk TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_femhead  TAvg_real_rice_price_mr TAvg_lland_holding TAvg_lreal_hhvalue TAvg_soil_qty_rev2 TAvg_hh_headage i.year, ll(0)
+tobit ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_lreal_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_worker TAvg_org_fert  TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
 
 margins, predict(ystar(0,.)) dydx(*) post
 
@@ -337,146 +363,8 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\without_median\compl
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*Median
-** CRE-TOBIT 
-tobit total_qty_w real_tpricefert_cens_mrk subsidy_qty_w mrk_dist_w num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 TAvg_total_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_real_tpricefert_cens_mrk TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_femhead TAvg_informal_save TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_pry_edu TAvg_finish_pry TAvg_finish_sec TAvg_safety_net TAvg_net_seller TAvg_net_buyer TAvg_soil_qty_rev2 i.zone i.year, ll(0)
-
-margins, predict(ystar(0,.)) dydx(*) post
-
-tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-
-
-
-
-
-
-
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
 
 
 ****************************
@@ -492,6 +380,96 @@ bysort hhid : egen sum_4waves_com_fer_bin = sum(commercial_dummy)
 
 
 
+bysort year : tabstat subsidy_dummy [w=weight], stat(mean sem)
+
+// By HH, sum the binary variable of commerical fert market particapation for all waves
+bysort hhid : egen sum_4waves_sub_fer_bin = sum(subsidy_dummy) 
+
+
+
+
+
+************************** descriptive statistics of  variables in second survey (2018)
+*************************************************************************************************************************************************************
+
+preserve
+
+keep if year ==2010
+tabstat total_qty_w subsidy_qty_w yhat dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+restore
+
+
+preserve
+
+keep if year ==2012
+tabstat total_qty_w subsidy_qty_w yhat dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+restore
+
+
+preserve
+
+keep if year ==2015
+tabstat total_qty_w subsidy_qty_w yhat dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+restore
+
+
+
+preserve
+
+keep if year ==2018
+tabstat total_qty_w subsidy_qty_w yhat dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+restore
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
+
+
+
+
+************Median***************
+use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", clear
+use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
+
+
+preserve
+
+keep if year ==2010
+tabstat total_qty_w subsidy_qty_w real_tpricefert_cens_mrk dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+restore
+
+
+preserve
+
+keep if year ==2012
+tabstat total_qty_w subsidy_qty_w real_tpricefert_cens_mrk dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+restore
+
+
+preserve
+
+keep if year ==2015
+tabstat total_qty_w subsidy_qty_w real_tpricefert_cens_mrk dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+restore
+
+
+
+preserve
+
+keep if year ==2018
+tabstat total_qty_w subsidy_qty_w real_tpricefert_cens_mrk dist_market_w  num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding femhead  formal_credit informal_credit ext_acess attend_sch safety_net informal_save soil_qty_rev2 org_fert annual_mean_temp annual_precipitation [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+restore
 
 
 
@@ -562,38 +540,14 @@ restore
 preserve  //south
 
 keep if  zone== 4 | zone==5 | zone==6
+*log
+** OLS with HH fixed effects
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  i.zone i.year, fe i(hhid) cluster(hhid)
 
+** OLS with HH fixed effects
+xtreg total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding lreal_hhvalue hh_headage  num_mem worker formal_credit informal_credit  org_fert annual_mean_temp annual_precipitation  i.zone i.year, fe i(hhid) cluster(hhid)
 
-
-
-
-
-
-**********************
-*Bootstraping more than one variable  (Correct!)
-************************
-* Modified Tobit model bootstrapping program with 4 marginal effects
-
-* Step 1: Define the program for Tobit estimation and margins calculation
-capture program drop boot_tobit	
-program define boot_tobit, rclass
-    * Step 2: Fit the Tobit model
-tobit total_qty_w yhat subsidy_qty_w mrk_dist_w num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 TAvg_total_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_yhat TAvg_num_mem TAvg_hh_headage TAvg_real_hhvalue TAvg_worker TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_femhead TAvg_informal_save TAvg_formal_credit TAvg_informal_credit TAvg_ext_acess TAvg_attend_sch TAvg_pry_edu TAvg_finish_pry TAvg_finish_sec TAvg_safety_net TAvg_net_seller TAvg_net_buyer TAvg_soil_qty_rev2 i.zone i.year, ll(0)
-   
-    * Step 3: Calculate marginal effects
-    margins, predict(ystar(0,.)) dydx(*) post
-    
-    * Step 4: Return the marginal effects for four variables
-    return scalar dydx_yhat = _b[yhat]
-    return scalar dydx_mrk_dist_w = _b[mrk_dist_w]
-    return scalar dydx_num_mem = _b[num_mem]
-    return scalar dydx_hh_headage = _b[hh_headage]
-end
-
-* Step 5: Use bootstrap to resample and calculate margins
-bootstrap r(dydx_yhat) r(dydx_mrk_dist_w) r(dydx_num_mem) r(dydx_hh_headage), reps(100) seed(123) cluster(hhid) idcluster(newid) saving(bootstrap_results, replace): boot_tobit
-
-tabstat total_qty_w subsidy_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 
@@ -608,63 +562,4 @@ tabstat total_qty_w subsidy_qty_w mrk_dist_w yhat num_mem hh_headage real_hhvalu
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*************Model sig
-
-
-capture program drop myboot	
-program define myboot, rclass
-** CRE-TOBIT
- preserve 
-
-
- heckman real_tpricefert_cens_mrk subsidy_qty_w hh_headage mrk_dist_w real_maize_price_mr real_rice_price_mr land_holding ext_acess   year_2010 year_2012 year_2015 year_2018, select (commercial_dummy= mrk_dist_w subsidy_qty_w hh_headage real_hhvalue real_maize_price_mr real_rice_price_mr land_holding femhead ext_acess attend_sch safety_net net_seller net_buyer soil_qty_rev2  year_2010 year_2012 year_2015 year_2018) twostep
-
-
-predict yhat, xb
-
-
-sum yhat, detail
-
-
-gen lyhat = log(yhat)
-*replace total_qty_w = 1 if total_qty_w==0
-gen ltotal_qty_w = log(total_qty_w + 1)
-
-local time_avg "lyhat ltotal_qty_w"
-
-foreach x in `time_avg' {
-
-	bysort hhid : egen TAvg_`x' = mean(`x')
-
-}
-
-
-** CRE-TOBIT 
-tobit ltotal_qty_w lyhat subsidy_qty_w mrk_dist_w  ext_acess attend_sch safety_net TAvg_ltotal_qty_w TAvg_subsidy_qty_w TAvg_mrk_dist_w TAvg_lyhat TAvg_ext_acess TAvg_attend_sch TAvg_safety_net i.year, ll(0)
-
-margins, predict(ystar(0,.)) dydx(*) post
-
-restore
-end
-bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+*************************************************************************************************************************************************************

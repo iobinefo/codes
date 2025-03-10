@@ -3,9 +3,9 @@
 
 
 
-*use "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckman.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckmanp.dta", clear
 
-use "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckman.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckmanp.dta", clear
 
 
 gen dummy = 1
@@ -15,17 +15,17 @@ tab dummy
 keep if dummy==4
 sort hhid
 
-*save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_Real_heckman", replace
-save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_Nominal_heckman", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_Real_heckmanp", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median/subset_Nominal_heckmanp", replace
 
 
-*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckman.dta"
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckman.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckmanp.dta"
+merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckmanp.dta"
 
 drop if _merge==2
 
-*save "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckman.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckman.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median\Real_heckmanp.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\Nominal_heckmanp.dta", replace
 
 
 gen year_2010 = (year==2010)
@@ -39,7 +39,7 @@ tab commercial_dummy
 
 
 tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 plot_elevation plot_slope plot_wetness dist_market_w annual_mean_temp annual_precipitation
 
 
 sum real_tpricefert_cens_mrk, detail
@@ -47,15 +47,15 @@ sum real_tpricefert_cens_mrk, detail
 
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckman.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckman.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckmanp.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckmanp.dta", replace
 
 
 
 
 
-*use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckman.dta", clear
-use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckman.dta", clear
+*use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Real_heckmanp.dta", clear
+use  "C:\Users\obine\Music\Documents\Project\codes\without_median\complete\Nominal_heckmanp.dta", clear
 
 
 

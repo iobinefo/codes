@@ -60,12 +60,19 @@ save  "${Nigeria_GHS_W3_created_data}/weight.dta", replace
 
 use "${Nigeria_GHS_W3_raw_data}\NGA_PlotGeovariables_Y3.dta", clear
 
+collapse (max) srtmslp_nga srtm_nga twi_nga, by (hhid)
+
+merge 1:m hhid using "${Nigeria_GHS_W3_raw_data}\NGA_HouseholdGeovars_Y3.dta"
+
 merge m:1 hhid using "${Nigeria_GHS_W3_created_data}/ag_rainy_15.dta", gen(filter)
 
 keep if ag_rainy_15==1
 ren srtmslp_nga plot_slope
 ren srtm_nga  plot_elevation
 ren twi_nga   plot_wetness
+ren af_bio_12 annual_precipitation
+ren af_bio_1 annual_mean_temp
+ren dist_market dist_market
 
 tab1 plot_slope plot_elevation plot_wetness, missing
 
@@ -81,6 +88,9 @@ egen med_wetness_ea = median( plot_wetness), by (ea)
 egen med_wetness_lga = median( plot_wetness), by (lga)
 egen med_wetness_state = median( plot_wetness), by (state)
 egen med_wetness_zone = median( plot_wetness), by (zone)
+egen med_prep = median( annual_precipitation)
+egen med_temp = median( annual_mean_temp)
+
 
 replace plot_slope= med_slope_ea if plot_slope==.
 replace plot_slope= med_slope_lga if plot_slope==.
@@ -94,11 +104,44 @@ replace plot_wetness= med_wetness_ea if plot_wetness==.
 replace plot_wetness= med_wetness_lga if plot_wetness==.
 replace plot_wetness= med_wetness_state if plot_wetness==.
 replace plot_wetness= med_wetness_zone if plot_wetness==.
+replace annual_precipitation= med_prep if annual_precipitation==.
+replace annual_mean_temp= med_temp if annual_mean_temp==.
 
-tab1 plot_slope plot_elevation plot_wetness, missing
+sum annual_precipitation, detail
+sum annual_mean_temp, detail
+sum dist_market, detail
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
+
+collapse (max) plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market, by (hhid)
 sort hhid
+
+merge 1:1 hhid using "${Nigeria_GHS_W3_created_data}/weight.dta", gen(wgt)
+
+merge 1:1 hhid using "${Nigeria_GHS_W3_created_data}/ag_rainy_15.dta", gen(filter)
+
+keep if ag_rainy_15==1
+
+************winzonrizing total_qty
+foreach v of varlist  dist_market  {
+	_pctile `v' [aw=weight] , p(1 99) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 1%"
+}
+
+
+tab dist_market
+tab dist_market_w, missing
+sum dist_market dist_market_w, detail
+
+keep hhid plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market_w
+
+
+
+
+
 la var plot_slope "slope of plot"
 la var plot_elevation "Elevation of plot"
 la var plot_wetness "Potential wetness index of plot"
@@ -197,10 +240,9 @@ tab subsidy_qty,missing
 sum subsidy_qty,detail
 
 
-gen subsidy_dummy = 0
-replace subsidy_dummy = 1 if institute ==2 | institute ==3
-tab subsidy_dummy, missing
-replace subsidy_dummy = 1 if institute2 ==2 | institute2 ==3
+
+gen subsidy_dummy = (subsidy_qty !=0)
+
 tab subsidy_dummy, missing
 replace subsidy_dummy = 1 if esubsidy_dummy ==1
 tab subsidy_dummy, missing
@@ -285,7 +327,21 @@ save "${Nigeria_GHS_W3_created_data}\E-wallet_subsidized_fert_2015.dta", replace
 */
 
 
+*********************************************** 
+*Seed
+***********************************************
 
+use "${Nigeria_GHS_W3_raw_data}\sect11e_plantingw3.dta",clear 
+merge m:1 hhid using "${Nigeria_GHS_W3_created_data}/ag_rainy_15.dta", gen(filter)
+
+keep if ag_rainy_15==1
+ tab s11eq14, nolabel
+ gen seed_dummy = (s11eq14==1)
+ collapse (max) seed_dummy, by (hhid)
+ tab seed_dummy
+
+
+save "${Nigeria_GHS_W3_created_data}\seed.dta", replace
 
 
 
@@ -353,7 +409,7 @@ gen tpricefert  = total_valuefert /total_qty
 tab tpricefert , missing
 
 gen tpricefert_cens = tpricefert  
-replace tpricefert_cens = 2000 if tpricefert_cens > 2000 & tpricefert_cens < . //winzorizing at bottom 10%
+replace tpricefert_cens = 800 if tpricefert_cens > 800 & tpricefert_cens < . //winzorizing at bottom 10%
 *replace tpricefert_cens = 12 if tpricefert_cens < 12
 tab tpricefert_cens, missing //winzorizing at top 5%
 
@@ -1524,6 +1580,9 @@ sort hhid
 merge 1:1 hhid using "${Nigeria_GHS_W3_created_data}\geodata_2015.dta"
 drop _merge
 sort hhid
+merge 1:1 hhid using "${Nigeria_GHS_W3_created_data}\seed.dta"
+drop _merge
+sort hhid
 merge 1:1 hhid using "${Nigeria_GHS_W3_created_data}\soil_quality_2015.dta"
 drop _merge
 sort hhid
@@ -1555,6 +1614,8 @@ replace mrk_dist_w = median_dist if mrk_dist_w==.
 
 misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer 
 
-save "${Nigeria_GHS_W3_created_data}\Nigeria_wave3_completedata_2015.dta", replace
+tab seed_dummy
+
+save "${Nigeria_GHS_W3_created_data}\Nigeria_wave3_completedatapn_2015.dta", replace
 
 

@@ -44,44 +44,37 @@ save  "${Uganda_GHS_W6_created_data}/ag_rainy_18.dta", replace
 
 
 
-/*
+*********************************************** 
+*seed
+***********************************************
 
-************************
-*Geodata Variables
-************************
+use "${Uganda_GHS_W6_raw_data}\agric\AGSEC4A.dta",clear 
 
-use "${Nigeria_GHS_W2_raw_data}\Geodata Wave 2\NGA_PlotGeovariables_Y2.dta", clear
+duplicates report hhid pltid 
 
-merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/ag_rainy_12.dta", gen(filter)
+gen seed_dummy = ( s4aq13==2)
+collapse (max) seed_dummy, by (hhid pltid )
 
-keep if ag_rainy_12==1
 
-merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/maize_12.dta", gen(maize)
+merge 1:m hhid pltid  using "${Uganda_GHS_W6_raw_data}\agric\AGSEC4B.dta", gen(fert)
 
-keep if maize_12==1
+merge m:1 hhid using "${Uganda_GHS_W6_created_data}/ag_rainy_18.dta", gen(filter)
 
-ren srtmslp_nga plot_slope
-ren srtm_nga  plot_elevation
-ren twi_nga   plot_wetness
+keep if filter==3
 
-tab1 plot_slope plot_elevation plot_wetness, missing
+keep if ag_rainy_18==1
 
-/*egen med_slope = median( plot_slope)
-egen med_elevation = median( plot_elevation)
-egen med_wetness = median( plot_wetness)
+tab s4bq13, nolabel
 
-replace plot_slope= med_slope if plot_slope==.
-replace plot_elevation= med_elevation if plot_elevation==.
-replace plot_wetness= med_wetness if plot_wetness==.*/
+replace seed_dummy = 1 if s4bq13==2
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
-sort hhid
-la var plot_slope "slope of plot"
-la var plot_elevation "Elevation of plot"
-la var plot_wetness "Potential wetness index of plot"
-save "${Nigeria_GHS_W2_created_data}\geodata_2012.dta", replace
+collapse (max) seed_dummy, by (hhid)
 
-*/
+la var seed_dummy "=1 improved seed"
+
+
+
+save  "${Uganda_GHS_W6_created_data}/seed.dta", replace
 
 
 
@@ -160,7 +153,7 @@ sum tpricefert, detail
 
 gen tpricefert_cens = tpricefert
 replace tpricefert_cens = 30000 if tpricefert_cens > 30000 & tpricefert_cens < . //winzorizing at bottom 10%
-*replace tpricefert_cens =533 if tpricefert_cens < 533
+*replace tpricefert_cens =1700 if tpricefert_cens < 1700
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
 replace tpricefert_cens=0 if tpricefert_cens==.
@@ -219,7 +212,14 @@ tab tpricefert_cens_mrk,missing
 */
 tab total_qty, missing
 
-collapse (sum) total_qty total_valuefert (max) tpricefert_cens_mrk, by(hhid)
+
+tab s3aq04, nolabel
+
+gen org_fert = (s3aq04==1 )
+replace org_fert =1 if s3bq04==1
+tab org_fert
+
+collapse (sum) total_qty total_valuefert (max) tpricefert_cens_mrk org_fert, by(hhid)
 
 
 merge 1:1 hhid using "${Uganda_GHS_W6_created_data}/ag_rainy_18.dta", gen(filter)
@@ -271,7 +271,7 @@ tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
 
 
-keep hhid total_qty_w total_valuefert real_tpricefert_cens_mrk
+keep hhid total_qty_w total_valuefert real_tpricefert_cens_mrk org_fert
 
 
 
@@ -1120,7 +1120,10 @@ tab hhasset_value_w, missing
 sum hhasset_value hhasset_value_w, detail
 
 
-gen real_hhvalue = hhasset_value_w  // / 0.9126678
+
+gen rea_hhvalue = hhasset_value_w  // / 0.9126678
+gen real_hhvalue = rea_hhvalue
+
 sum hhasset_value_w real_hhvalue, detail
 
 
@@ -1514,9 +1517,9 @@ drop _merge
 sort hhid
 
 
-merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\savings_2018.dta"
-drop _merge
-sort hhid
+*merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\savings_2018.dta"
+*drop _merge
+*sort hhid
 merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\credit_2018.dta"
 *drop if _merge==2
 drop _merge
@@ -1537,9 +1540,9 @@ sort hhid
 merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\food_prices_2018.dta"
 drop _merge
 sort hhid
-*merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\geodata_2018.dta"
-*drop _merge
-*sort hhid
+merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\seed.dta"
+drop _merge
+sort hhid
 merge 1:1 hhid using "${Uganda_GHS_W6_created_data}\soil_quality_2018.dta"
 drop _merge
 sort hhid
@@ -1585,6 +1588,10 @@ replace mrk_dist_w= median_mrk if mrk_dist_w==.
 
 
 replace real_tpricefert_cens_mrk= 0 if real_tpricefert_cens_mrk==.
+replace seed_dummy= 0 if seed_dummy==.
+
+replace org_fert= 0 if org_fert==.
+
 
 replace total_qty_w= 0 if total_qty_w==.
 
@@ -1600,8 +1607,7 @@ sum total_qty_w, detail
 sum real_tpricefert_cens_mrk, detail
 ren t0_hhid HHID 
 
-save "${Uganda_GHS_W6_created_data}\Uganda_wave6_complete_data.dta", replace
-
+save "${Uganda_GHS_W6_created_data}\Uganda_wave6_complete_datap.dta", replace
 
 
 
@@ -1614,8 +1620,8 @@ save "${Uganda_GHS_W6_created_data}\Uganda_wave6_complete_data.dta", replace
 
 
 *****************Appending all Nigeria Datasets*****************
-use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave6\Uganda_wave6_complete_data.dta"  ,clear
-append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave5\Uganda_wave5_complete_data.dta"
+use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave6\Uganda_wave6_complete_datap.dta"  ,clear
+append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave5\Uganda_wave5_complete_datapn.dta"
 
 *append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave3\Uganda_wave3_complete_data.dta"
 
@@ -1633,10 +1639,10 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk  real_maize_price_mr rea
 
 
 
-misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net
+misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net org_fert seed_dummy
 
 
 
 * safety_net
 
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18p.dta", replace

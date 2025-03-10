@@ -8,8 +8,8 @@
 *************************************************
 *Median 2018
 
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21.dta", clear
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21p.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21p.dta", clear
 
 
 tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
@@ -34,7 +34,7 @@ sum lland_holding, detail
 
 sum real_tpricefert_cens_mrk, detail
 
-local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue"
+local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert annual_mean_temp annual_precipitation informal_save formal_save formal_bank"
 
 foreach x in `time_avg' {
 
@@ -58,18 +58,40 @@ foreach x in `time_avg' {
 
 }
 
+gen float hhid1 = real(hhid)
+
+
+
+*log
+** OLS with HH fixed effects
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation i.year, fe i(hhid1) cluster(hhid1)
+
+
+
+** OLS with HH fixed effects
+xtreg total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation i.year, fe i(hhid1) cluster(hhid1)
+
+tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+
+
+
 
 ********************************************
 *Using Functional Forms
 ********************************************
 
+*****************************************************************************************************************************************************
+*****************************************************************************************************************************************************
 
 capture program drop myboot	
 program define myboot, rclass
  preserve 
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w mrk_dist_w lreal_tpricefert_cens_mrk real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_ltotal_qty_w TAvg_mrk_dist_w TAvg_lreal_tpricefert_cens_mrk  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
+tobit ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation              TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_real_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_worker TAvg_formal_credit TAvg_informal_credit TAvg_org_fert i.year, ll(0)
 
 
 
@@ -92,7 +114,7 @@ program define myboot, rclass
 ** CRE-TOBIT
 preserve 
 
-tobit total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr hh_headage lreal_hhvalue land_holding femhead ext_acess attend_sch  safety_net soil_qty_rev2  formal_credit informal_credit num_mem worker TAvg_total_qty_w TAvg_mrk_dist_w TAvg_real_tpricefert_cens_mrk  TAvg_hh_headage TAvg_lreal_hhvalue   TAvg_femhead TAvg_ext_acess TAvg_attend_sch TAvg_safety_net TAvg_soil_qty_rev2 TAvg_real_maize_price_mr  TAvg_land_holding TAvg_formal_credit TAvg_informal_credit  TAvg_num_mem TAvg_worker i.year, ll(0)
+tobit total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation              TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_real_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_worker TAvg_formal_credit TAvg_informal_credit TAvg_org_fert i.year, ll(0)
 
 
 margins, predict(ystar(0,.)) dydx(*) post
@@ -106,7 +128,124 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\resu
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Level_nominal_median.doc", replace word
 
 
-tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w  real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+***************************************Using Organic fertilizer as an instrumental variable*******************************
+*****************************************************************************************************************************************************
+
+********************************************
+*Using Functional Forms
+********************************************
+
+
+capture program drop myboot	
+program define myboot, rclass
+ preserve 
+
+** CRE-TOBIT 
+tobit ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit  annual_mean_temp annual_precipitation              TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_real_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_worker TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
+
+
+
+margins, predict(ystar(0,.)) dydx(*) post
+
+restore
+end
+bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Log_real_median_organic.doc", replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Log_nominal_median_organic.doc", replace word
+
+
+***********************************************************
+*Tobit Bootstrap
+***********************************************************
+capture program drop myboot
+program define myboot, rclass
+** CRE-TOBIT
+preserve 
+
+tobit total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit  annual_mean_temp annual_precipitation              TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_real_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_worker TAvg_formal_credit TAvg_informal_credit i.year, ll(0)
+
+
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+
+bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Level_real_median_organic.doc", replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Level_nominal_median_organic.doc", replace word
+
+
+tabstat total_qty_w  real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+*****************************************************************************************************************************************************
+*****************************************************************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

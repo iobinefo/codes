@@ -3,9 +3,9 @@
 
 
 
-*use "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Real_median.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Real_median.dta", clear
 
-use "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Nominal_median.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Nominal_median.dta", clear
 
 
 gen dummy = 1
@@ -15,17 +15,17 @@ tab dummy
 keep if dummy==4
 sort hhid
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Nigeria/subset_Real_median", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Nigeria/subset_Nominal_median", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Nigeria/subset_Real_median", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Nigeria/subset_Nominal_median", replace
 
 
-*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Real_median.dta"
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Nominal_median.dta"
+merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Real_median.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Nominal_median.dta"
 
 drop if _merge==2
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Real_median.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Nominal_median.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Real_median.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\Nominal_median.dta", replace
 
 
 gen year_2010 = (year==2010)
@@ -47,15 +47,15 @@ sum real_tpricefert_cens_mrk, detail
 
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", replace
 
 
 
 
 
-*use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", clear
-use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
+use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", clear
+*use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
 
 
 
@@ -63,7 +63,7 @@ use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_medi
 
 
 tabstat total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding  subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 annual_mean_temp annual_precipitation
 
 sum real_tpricefert_cens_mrk, detail
 

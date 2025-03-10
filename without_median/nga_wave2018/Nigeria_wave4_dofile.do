@@ -63,18 +63,70 @@ save  "${Nigeria_GHS_W4_created_data}/weight.dta", replace
 ************************
 
 use "${Nigeria_GHS_W4_raw_data}\nga_plotgeovariables_y4.dta", clear
+
+destring srtmslp_nga, replace force
+recast byte srtmslp_nga
+collapse (max) srtmslp_nga srtm_nga twi_nw, by (hhid)
+
+merge 1:m hhid using "${Nigeria_GHS_W4_raw_data}\nga_householdgeovars_y4.dta"
+
 merge m:1 hhid using "${Nigeria_GHS_W4_created_data}/ag_rainy_18.dta", gen(filter)
 
 keep if ag_rainy_18==1
 
-encode srtmslp_nga, gen( plot_slope)
+ren srtmslp_nga plot_slope
 ren srtm_nga  plot_elevation
 ren twi_nw  plot_wetness
+ren af_bio_12 annual_precipitation
+ren af_bio_1 annual_mean_temp
+ren dist_market dist_market
 
 tab1 plot_slope plot_elevation plot_wetness, missing
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
+egen med_slope = median( plot_slope)
+egen med_elevation = median( plot_elevation)
+egen med_wetness = median( plot_wetness)
+egen med_prep = median( annual_precipitation)
+egen med_temp = median( annual_mean_temp)
+
+replace plot_slope= med_slope if plot_slope==.
+replace plot_elevation= med_elevation if plot_elevation==.
+replace plot_wetness= med_wetness if plot_wetness==.
+replace annual_precipitation= med_prep if annual_precipitation==.
+replace annual_mean_temp= med_temp if annual_mean_temp==.
+
+sum annual_precipitation, detail
+sum annual_mean_temp, detail
+sum dist_market, detail
+
+
+collapse (max) plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market, by (hhid)
 sort hhid
+
+merge 1:1 hhid using "${Nigeria_GHS_W4_created_data}/weight.dta", gen(wgt)
+
+merge 1:1 hhid using "${Nigeria_GHS_W4_created_data}/ag_rainy_18.dta", gen(filter)
+
+keep if ag_rainy_18==1
+
+************winzonrizing total_qty
+foreach v of varlist  dist_market  {
+	_pctile `v' [aw=weight] , p(1 99) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 1%"
+}
+
+
+tab dist_market
+tab dist_market_w, missing
+sum dist_market dist_market_w, detail
+
+keep hhid plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market_w
+
+
 la var plot_slope "slope of plot"
 la var plot_elevation "Elevation of plot"
 la var plot_wetness "Potential wetness index of plot"
@@ -226,8 +278,9 @@ tab subsidy_qty,missing
 sum subsidy_qty,detail
 
 
-gen subsidy_dummy = 0
-replace subsidy_dummy = 1 if s11c3q6b ==1 | s11c3q6b ==3
+gen subsidy_dummy = (subsidy_qty !=0)
+
+tab subsidy_dummy, missing
 tab subsidy_dummy, missing
 
 
@@ -270,7 +323,22 @@ save "${Nigeria_GHS_W4_created_data}\subsidized_fert_2018.dta", replace
 
 
 
+*********************************************** 
+*Seed
+***********************************************
 
+use "${Nigeria_GHS_W4_raw_data}\sect11e1_plantingw4.dta",clear   
+merge m:1 hhid using "${Nigeria_GHS_W4_created_data}/ag_rainy_18.dta", gen(filter)
+
+keep if ag_rainy_18==1
+
+ tab s11eq14, nolabel
+ gen seed_dummy = (s11eq14==1)
+ collapse (max) seed_dummy, by (hhid)
+ tab seed_dummy
+
+
+save "${Nigeria_GHS_W4_created_data}\seed.dta", replace
 
 
 
@@ -317,7 +385,7 @@ gen tpricefert = cost_fert_real/total_qty
 tab tpricefert
 
 gen tpricefert_cens = tpricefert 
-replace tpricefert_cens = 900 if tpricefert_cens > 900 & tpricefert_cens < .   //winzonrizing bottom 1%
+replace tpricefert_cens = 600 if tpricefert_cens > 600 & tpricefert_cens < .   //winzonrizing bottom 1%
 *replace tpricefert_cens = 60 if tpricefert_cens < 60
 tab tpricefert_cens, missing //winzonrizing top 1%
 
@@ -1482,6 +1550,9 @@ sort hhid
 merge 1:1 hhid using "${Nigeria_GHS_W4_created_data}\geodata_2018.dta"
 drop _merge
 sort hhid
+merge 1:1 hhid using "${Nigeria_GHS_W4_created_data}\seed.dta"
+drop _merge
+sort hhid
 merge 1:1 hhid using "${Nigeria_GHS_W4_created_data}\household_asset_2018.dta"
 drop _merge
 sort hhid
@@ -1516,11 +1587,10 @@ replace mrk_dist_w = median_dist if mrk_dist_w==.
 egen median_head = median(hh_headage)
 replace hh_headage = median_head if hh_headage==.
 
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer 
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer plot_elevation plot_slope plot_wetness dist_market_w annual_mean_temp annual_precipitation
 
 
-save "${Nigeria_GHS_W4_created_data}/Nigeria_wave4_completedata_2018.dta", replace
-
+save "${Nigeria_GHS_W4_created_data}/Nigeria_wave4_completedatap_2018.dta", replace
 
 
 
@@ -1529,10 +1599,10 @@ save "${Nigeria_GHS_W4_created_data}/Nigeria_wave4_completedata_2018.dta", repla
 
 
 *****************Appending all Nigeria Datasets*****************
-use "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2010\Nigeria_wave1_complete_data.dta",clear
-append using "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2012\Nigeria_wave2_complete_data.dta.dta"
-append using "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2015\Nigeria_wave3_completedata_2015.dta"
-append using "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2018\Nigeria_wave4_completedata_2018.dta"
+use "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2010\Nigeria_wave1_complete_datapn.dta",clear
+append using "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2012\Nigeria_wave2_complete_datapn.dta"
+append using "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2015\Nigeria_wave3_completedatapn_2015.dta"
+append using "C:\Users\obine\Music\Documents\Project\codes\without_median\nga_wave2018\Nigeria_wave4_completedatap_2018.dta"
 
 order year
 
@@ -1555,7 +1625,7 @@ proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext
 
 
 
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer 
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer plot_elevation plot_slope plot_wetness dist_market_w annual_mean_temp annual_precipitation
 
 egen median_maiz = median(real_maize_price_mr)
 replace real_maize_price_mr = median_maiz if real_maize_price_mr==.
@@ -1569,12 +1639,14 @@ replace mrk_dist_w = median_dis if mrk_dist_w==.
 egen median_hea = median(hh_headage)
 replace hh_headage = median_hea if hh_headage==.
 
-misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer 
+misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer plot_elevation plot_slope plot_wetness dist_market_w annual_mean_temp annual_precipitation
 
 
+tab seed_dummy
 
+save "C:\Users\obine\Music\Documents\Project\codes\without_median/Nominal_heckmanp", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\without_median/Real_heckmanp", replace
 
-save "C:\Users\obine\Music\Documents\Project\codes\without_median/Nominal_heckman", replace
 
 
 

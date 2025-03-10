@@ -4,6 +4,7 @@
 
 
 
+
 clear
 
 global Nigeria_GHS_W2_raw_data 		"C:\Users\obine\Music\Documents\Smallholder lsms STATA\NGA_2012_GHSP-W2_v02_M_STATA" 
@@ -57,25 +58,69 @@ save  "${Nigeria_GHS_W2_created_data}/weight.dta", replace
 
 use "${Nigeria_GHS_W2_raw_data}\Geodata Wave 2\NGA_PlotGeovariables_Y2.dta", clear
 
+collapse (max) srtmslp_nga srtm_nga twi_nga, by (hhid)
+
+merge 1:m hhid using "${Nigeria_GHS_W2_raw_data}\Geodata Wave 2\NGA_HouseholdGeovars_Y2.dta"
+
 merge m:1 hhid using "${Nigeria_GHS_W2_created_data}/ag_rainy_12.dta", gen(filter)
 
 keep if ag_rainy_12==1
 ren srtmslp_nga plot_slope
 ren srtm_nga  plot_elevation
 ren twi_nga   plot_wetness
+ren af_bio_12 annual_precipitation
+ren af_bio_1 annual_mean_temp
+ren dist_market dist_market
+
+
 
 tab1 plot_slope plot_elevation plot_wetness, missing
 
-/*egen med_slope = median( plot_slope)
+egen med_slope = median( plot_slope)
 egen med_elevation = median( plot_elevation)
 egen med_wetness = median( plot_wetness)
+egen med_prep = median( annual_precipitation)
+egen med_temp = median( annual_mean_temp)
 
 replace plot_slope= med_slope if plot_slope==.
 replace plot_elevation= med_elevation if plot_elevation==.
-replace plot_wetness= med_wetness if plot_wetness==.*/
+replace plot_wetness= med_wetness if plot_wetness==.
+replace annual_precipitation= med_prep if annual_precipitation==.
+replace annual_mean_temp= med_temp if annual_mean_temp==.
 
-collapse (sum) plot_slope plot_elevation plot_wetness, by (hhid)
+sum annual_precipitation, detail
+sum annual_mean_temp, detail
+sum dist_market, detail
+
+
+collapse (max) plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market, by (hhid)
 sort hhid
+
+
+
+merge 1:1 hhid using  "${Nigeria_GHS_W2_created_data}/weight.dta", gen (wgt)
+merge 1:1 hhid using "${Nigeria_GHS_W2_created_data}/ag_rainy_12.dta", gen(filter)
+
+keep if ag_rainy_12==1
+
+************winzonrizing total_qty
+foreach v of varlist  dist_market  {
+	_pctile `v' [aw=weight] , p(1 99) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 1%"
+}
+
+
+tab dist_market
+tab dist_market_w, missing
+sum dist_market dist_market_w, detail
+
+keep hhid plot_slope plot_elevation plot_wetness  annual_precipitation annual_mean_temp dist_market_w
+
+
 la var plot_slope "slope of plot"
 la var plot_elevation "Elevation of plot"
 la var plot_wetness "Potential wetness index of plot"
@@ -137,9 +182,9 @@ sum private,detail
 
 
 *************Getting Subsidized quantity and Dummy Variable *******************
-gen subsidy_qty1 = s11dq16 if institute ==4 | institute ==5
+gen subsidy_qty1 = s11dq16 if institute ==4 | institute ==5 //6 
 tab subsidy_qty1
-gen subsidy_qty2 = s11dq28 if institute2 ==2 | institute2 ==3
+gen subsidy_qty2 = s11dq28 if institute2 ==2 | institute2 ==3  //
 tab subsidy_qty2
 
 
@@ -148,10 +193,9 @@ tab subsidy_qty,missing
 sum subsidy_qty,detail
 
 
-gen subsidy_dummy = 0
-replace subsidy_dummy = 1 if institute ==4 | institute ==5 |institute2 ==2 | institute2 ==3
-tab subsidy_dummy, missing
+gen subsidy_dummy = (subsidy_qty !=0)
 
+tab subsidy_dummy, missing
 
 collapse (sum)subsidy_qty (max) subsidy_dummy, by (hhid)
 
@@ -245,9 +289,11 @@ tab total_valuefert,missing
 gen tpricefert = total_valuefert/total_qty
 tab tpricefert
 
+
+
 gen tpricefert_cens = tpricefert
 replace tpricefert_cens = 600 if tpricefert_cens > 600 & tpricefert_cens < . //winzorizing at bottom 4%
-replace tpricefert_cens = 2 if tpricefert_cens < 2
+replace tpricefert_cens = 12 if tpricefert_cens < 12
 tab tpricefert_cens, missing  //winzorizing at top 4%
 
 
@@ -1426,9 +1472,9 @@ replace mrk_dist_w = median_dist if mrk_dist_w==.
 
 egen median_head = median(hh_headage)
 replace hh_headage = median_head if hh_headage==.
+
 egen median_real_tpricefert_cens_mrk = median(real_tpricefert_cens_mrk)
 replace real_tpricefert_cens_mrk = median_real_tpricefert_cens_mrk if real_tpricefert_cens_mrk==.
-
 
 
 misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker real_maize_price_mr real_rice_price_mr land_holding subsidy_dummy femhead informal_save formal_credit informal_credit ext_acess attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer 
@@ -1437,7 +1483,7 @@ misstable summarize total_qty_w subsidy_qty_w mrk_dist_w real_tpricefert_cens_mr
 
 
 
-save "${Nigeria_GHS_W2_created_data}\Nigeria_wave2_complete_data.dta.dta", replace
+save "${Nigeria_GHS_W2_created_data}\Nigeria_wave2_complete_datan.dta", replace
 
 
 

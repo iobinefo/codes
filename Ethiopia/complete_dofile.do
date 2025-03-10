@@ -4,8 +4,8 @@
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_heckman15.dta", clear
 
 
-*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price21.dta", clear
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_price21.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price21p.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_price21p.dta", clear
 
 
 sort hhid year
@@ -23,8 +23,8 @@ sort hhid
 *save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Nominal_heckman15.dta", replace
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Real_price_21.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Nominal_price21.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Real_price_21p.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Nominal_price21p.dta", replace
 
 
 
@@ -34,8 +34,8 @@ save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\subset_Nominal_price
 *merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_heckman15.dta"
 
 
-*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price21.dta"
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_price21.dta"
+merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Real_price21p.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\Nominal_price21p.dta"
 
 
 
@@ -66,13 +66,31 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real
 *real_maize_price_mr real_rice_price_mr informal_save pry_edu finish_pry finish_sec net_seller net_buyer 
 
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer 
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert informal_save
+
+egen med_s = median(plot_slope)
+egen med_w = median(plot_wetness)
+egen med_e = median(plot_elevation)
+egen med_ss = median(hh_slope)
+egen med_ww = median(hh_wetness)
+egen med_ee = median(hh_elevation)
+egen med_d = median(dist_admarc_w)
+
+replace plot_slope = med_s if plot_slope ==.
+replace plot_wetness = med_w if plot_wetness ==.
+replace plot_elevation = med_e if plot_elevation ==.
+replace hh_slope = med_ss if hh_slope ==.
+replace hh_wetness = med_ww if hh_wetness ==.
+replace hh_elevation = med_ee if hh_elevation ==.
+replace dist_admarc_w = med_d if dist_admarc_w ==.
+
 
 
 *save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_heckman15.dta", replace
 *save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_heckman15.dta", replace
-*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_price21.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_price21.dta", replace
+
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_price21p.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_price21p.dta", replace
 
 
 
@@ -85,6 +103,7 @@ save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_pri
 
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_heckman15.dta", clear
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_heckman15.dta", clear
+
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_price21.dta", clear
 use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_price21.dta", clear
 

@@ -4,8 +4,8 @@
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Nominal_median15.dta", clear
 
 
-*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Real_median21.dta", clear
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Nominal_median21.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Real_median21p.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Nominal_median21p.dta", clear
 
 
 sort hhid year
@@ -23,8 +23,8 @@ sort hhid
 *save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\subset_Nominal_median15.dta", replace
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\subset_Real_median21.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\subset_Nominal_median21.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\subset_Real_median21p.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\subset_Nominal_median21p.dta", replace
 
 
 
@@ -34,8 +34,8 @@ save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\subset_Nomina
 *merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Nominal_median15.dta"
 
 
-*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Real_median21.dta"
-merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Nominal_median21.dta"
+*merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Real_median21p.dta"
+merge 1:m hhid using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\Nominal_median21p.dta"
 
 
 
@@ -71,8 +71,9 @@ misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  
 
 *save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median15.dta", replace
 *save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median15.dta", replace
-*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21.dta", replace
+
+*save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21p.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21p.dta", replace
 
 
 
@@ -85,12 +86,12 @@ save "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nomi
 
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median15.dta", clear
 *use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median15.dta", clear
-*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21.dta", clear
-use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Real_median21.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\complete\Nominal_median21.dta", clear
 
 
 
-local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2"
+local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 plot_slope "
 
 foreach x in `time_avg' {
 

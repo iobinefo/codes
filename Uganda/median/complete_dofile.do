@@ -155,8 +155,8 @@ restore
 
 
 
-*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18.dta", clear
-use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta", clear
 
 
 
@@ -173,12 +173,12 @@ keep if dummy==2
 sort HHID
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Real_Price_median18.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Nominal_Price_median18.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Real_Price_median18p.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Nominal_Price_median18p.dta", replace
 
 
-*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18.dta"
-merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18.dta"
+merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta"
+*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta"
 
 
 
@@ -196,15 +196,15 @@ gen year_2018 = (year==2018)
 gen commercial_dummy = (total_qty_w>0)
 
 
-misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net
+misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net seed_dummy org_fert
 
 
 tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk  real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 *formal_credit informal_credit safety_net
 
-*save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Real_Price_median18.dta", replace
-save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Nominal_Price_median18.dta", replace
+save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Real_Price_median18p.dta", replace
+*save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Nominal_Price_median18p.dta", replace
 
 
 

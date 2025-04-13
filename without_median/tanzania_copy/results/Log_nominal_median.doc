@@ -1,0 +1,91 @@
+{\rtf1\fs24
+\trowd\trgaph75\trleft-75\intbl\trqc\clbrdrt\brdrs\cellx4464\clbrdrt\brdrs\cellx6048
+\ql \cell\qc (1)\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx4464\cellx6048
+\trowd\trgaph75\trleft-75\trqc\clbrdrb\brdrs\cellx4464\clbrdrb\brdrs\cellx6048
+\ql VARIABLES\cell\qc y1\cell\row
+\trowd\trgaph75\trleft-75\trqc\cellx4464\cellx6048
+\ql \cell\qc \cell\row
+\ql lreal_tpricefert_cens_mrk\cell\qc -0.146\cell\row
+\ql \cell\qc (0.486)\cell\row
+\ql subsidy_qty_w\cell\qc -0.00173\cell\row
+\ql \cell\qc (0.00228)\cell\row
+\ql dist_cens_w\cell\qc 0.00428\cell\row
+\ql \cell\qc (0.00338)\cell\row
+\ql real_maize_price_mr\cell\qc -0.00104\cell\row
+\ql \cell\qc (0.000726)\cell\row
+\ql real_rice_price_mr\cell\qc 4.97e-06\cell\row
+\ql \cell\qc (0.000414)\cell\row
+\ql ext_acess\cell\qc 0.0641\cell\row
+\ql \cell\qc (0.0903)\cell\row
+\ql attend_sch\cell\qc -0.314\cell\row
+\ql \cell\qc (0.427)\cell\row
+\ql femhead\cell\qc 0.209\cell\row
+\ql \cell\qc (0.157)\cell\row
+\ql hh_headage_mrk\cell\qc -0.0189***\cell\row
+\ql \cell\qc (0.00659)\cell\row
+\ql lreal_hhvalue\cell\qc 0.100***\cell\row
+\ql \cell\qc (0.0385)\cell\row
+\ql lfield_size_ha_w\cell\qc -0.0335\cell\row
+\ql \cell\qc (0.0468)\cell\row
+\ql safety_net\cell\qc -0.104\cell\row
+\ql \cell\qc (0.122)\cell\row
+\ql org_fert\cell\qc 0.326**\cell\row
+\ql \cell\qc (0.129)\cell\row
+\ql num_mem\cell\qc -0.0936***\cell\row
+\ql \cell\qc (0.0234)\cell\row
+\ql worker\cell\qc 0.0743*\cell\row
+\ql \cell\qc (0.0433)\cell\row
+\ql formal_credit\cell\qc 0.244\cell\row
+\ql \cell\qc (0.486)\cell\row
+\ql informal_credit\cell\qc -0.289**\cell\row
+\ql \cell\qc (0.142)\cell\row
+\ql TAvg_ltotal_qty_w\cell\qc 0.595***\cell\row
+\ql \cell\qc (0.0469)\cell\row
+\ql TAvg_lreal_tpricefert_cens_mrk\cell\qc -0.153\cell\row
+\ql \cell\qc (0.607)\cell\row
+\ql TAvg_subsidy_qty_w\cell\qc 0.00473\cell\row
+\ql \cell\qc (0.00313)\cell\row
+\ql TAvg_dist_cens_w\cell\qc -0.00636\cell\row
+\ql \cell\qc (0.00460)\cell\row
+\ql TAvg_real_maize_price_mr\cell\qc 0.000561\cell\row
+\ql \cell\qc (0.00103)\cell\row
+\ql TAvg_real_rice_price_mr\cell\qc 0.000911\cell\row
+\ql \cell\qc (0.000557)\cell\row
+\ql TAvg_ext_acess\cell\qc -0.161\cell\row
+\ql \cell\qc (0.151)\cell\row
+\ql TAvg_attend_sch\cell\qc 0.431\cell\row
+\ql \cell\qc (0.380)\cell\row
+\ql TAvg_femhead\cell\qc -0.227\cell\row
+\ql \cell\qc (0.199)\cell\row
+\ql TAvg_hh_headage_mrk\cell\qc 0.0136*\cell\row
+\ql \cell\qc (0.00787)\cell\row
+\ql TAvg_lreal_hhvalue\cell\qc -0.105*\cell\row
+\ql \cell\qc (0.0537)\cell\row
+\ql TAvg_lfield_size_ha_w\cell\qc 0.0243\cell\row
+\ql \cell\qc (0.0672)\cell\row
+\ql TAvg_safety_net\cell\qc 0.0607\cell\row
+\ql \cell\qc (0.216)\cell\row
+\ql TAvg_org_fert\cell\qc -0.152\cell\row
+\ql \cell\qc (0.186)\cell\row
+\ql TAvg_num_mem\cell\qc 0.0745**\cell\row
+\ql \cell\qc (0.0369)\cell\row
+\ql TAvg_worker\cell\qc -0.00930\cell\row
+\ql \cell\qc (0.0573)\cell\row
+\ql TAvg_formal_credit\cell\qc -0.683\cell\row
+\ql \cell\qc (0.631)\cell\row
+\ql TAvg_informal_credit\cell\qc 0.543**\cell\row
+\ql \cell\qc (0.265)\cell\row
+\ql 2012.year\cell\qc -0.141\cell\row
+\ql \cell\qc (0.297)\cell\row
+\ql 2014.year\cell\qc -0.369\cell\row
+\ql \cell\qc (0.283)\cell\row
+\ql 2020.year\cell\qc 0.186\cell\row
+\ql \cell\qc (0.452)\cell\row
+\ql \cell\qc \cell\row
+\trowd\trgaph75\trleft-75\trqc\trbrdrb\brdrs\clbrdrb\brdrs\cellx4464\clbrdrb\brdrs\cellx6048
+\ql Observations\cell\qc 1,748\cell\row
+\pard\qc
+Standard errors in parentheses\par
+*** p<0.01, ** p<0.05, * p<0.1\par
+}

@@ -28,7 +28,9 @@ gen lreal_hhvalue = log(real_hhvalue)
 sum lland_holding, detail
 
 
-
+gen good_soil = (soil_qty_rev2==1)
+gen fair_soil = (soil_qty_rev2==2)
+ 
 sum real_tpricefert_cens_mrk, detail
 
 local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue org_fert"
@@ -57,7 +59,16 @@ foreach x in `time_avg' {
 
 }
 
-gen float hhid1 = real(HHID)
+gen hhid2 = substr(HHID, 2, .)
+
+
+gen float hhid1 = real(hhid2)
+
+duplicates report hhid1
+
+sort hhid1 year
+
+order hhid1
 
 
 *log
@@ -70,6 +81,32 @@ xtreg ltotal_qty_w lreal_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_
 xtreg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
 
 tabstat total_qty_w real_tpricefert_cens_mrk  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+**********************************************Without org_fert**********************************************************
+*****************************************************************************************************************************************************
+
+*log
+** OLS with HH fixed effects
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
+
+
+
+** OLS with HH fixed effects
+xtreg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
+
+tabstat total_qty_w real_tpricefert_cens_mrk  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+
+
+*************First Stage Regression
+
+reg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit soil_qty_rev2 i.year 
+
+reg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit good_soil fair_soil i.year 
+
 
 
 

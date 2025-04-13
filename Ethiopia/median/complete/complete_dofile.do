@@ -74,9 +74,23 @@ xtreg total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr rea
 tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
+**********************************************Without org_fert**********************************************************
+*****************************************************************************************************************************************************
+
+
+*log
+** OLS with HH fixed effects
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit  annual_mean_temp annual_precipitation i.year, fe i(hhid1) cluster(hhid1)
 
 
 
+** OLS with HH fixed effects
+xtreg total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit  annual_mean_temp annual_precipitation i.year, fe i(hhid1) cluster(hhid1)
+
+tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+*****************************************************************************************************************************************************
+*****************************************************************************************************************************************************
 
 
 ********************************************
@@ -106,9 +120,7 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\resu
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Log_nominal_median.doc", replace word
 
 
-***********************************************************
-*Tobit Bootstrap
-***********************************************************
+*Level
 capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
@@ -160,9 +172,7 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\resu
 outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\median\results\Log_nominal_median_organic.doc", replace word
 
 
-***********************************************************
-*Tobit Bootstrap
-***********************************************************
+*Level
 capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT

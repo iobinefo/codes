@@ -1,9 +1,9 @@
-
+log using "C:\Users\obine\Music\Documents\Project\codes\Malawi_log_file.smcl", append
 **********************************************
 
 *Heckman Log
-use  "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Real_heckman.dta" , clear
-use  "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Nominal_heckman.dta" , clear
+use "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Real_heckmanp.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Nominal_heckmanp.dta", clear
 
 *we decided to go with the one withiout p
 
@@ -44,7 +44,7 @@ gen fair_soil = (soil_qty_rev2==2)
 tabstat total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker avg_maize_pr maize_price_mr hhasset_value_w land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding region plot_slope plot_elevation plot_wetness annual_precipitation annual_mean_temp org_fert
+misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding region plot_slope plot_elevation plot_wetness annual_precipitation annual_mean_temp org_fert good fair
 
 proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
@@ -73,7 +73,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert  good_soil fair_soil   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert  good fair   i.year) twostep
 predict yhat, xb
 predict inm, mills
 
@@ -96,7 +96,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert good_soil fair_soil   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert good fair  i.year) twostep
 predict yhat, xb
 predict inm, mills
 
@@ -123,7 +123,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem good_soil fair_soil   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem good fair  i.year) twostep
 predict yhat, xb
 predict inm, mills
 
@@ -139,81 +139,107 @@ tobit ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holdin
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
-bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
+bootstrap, reps(50) seed(123) cluster(HHID) idcluster(newid): myboot
 
 
 capture program drop myboot	
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem good_soil fair_soil   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem good fair   i.year) twostep
 predict yhat, xb
 predict inm, mills
 
-local time_avg "yhat"
+
+foreach v of varlist  yhat  {
+	_pctile `v' [aw=weight] , p(1 95) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 5%"
+}
+
+
+local time_avg "yhat_w"
 foreach x in `time_avg' {
-	bysort HHID : egen TAvg_`x' = mean(`x')
+	bysort hhid : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit total_qty_w yhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem       TAvg_total_qty_w TAvg_yhat TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert TAvg_hh_headage_mrk  TAvg_attend_sch TAvg_femhead TAvg_num_mem inm i.year, ll(0)
+tobit total_qty_w yhat_w subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem       TAvg_total_qty_w TAvg_yhat_w TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert TAvg_hh_headage_mrk  TAvg_attend_sch TAvg_femhead TAvg_num_mem inm i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
 bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
 
-tabstat total_qty_w subsidy_qty_w  yhat num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w subsidy_qty_w  yhat yhat_w num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 
-
-
-**********************************************
-*Third Stage Regression
-**********************************************
+******************************Using OLS Regression***********************************************************************************************************
+*************************************************************************************************************************************************************
 capture program drop myboot	
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem formal_credit  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem formal_credit good_soil fair_soil   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem good fair  i.year) twostep
 predict yhat, xb
 predict inm, mills
 
 sum yhat, detail
 gen lyhat = log(yhat)
 gen ltotal_qty_w = log(total_qty_w + 1)
-local time_avg "lyhat ltotal_qty_w"
+local time_avg "lyhat ltotal_qty_w yhat"
 foreach x in `time_avg' {
 	bysort HHID : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem formal_credit       TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert TAvg_hh_headage_mrk  TAvg_attend_sch TAvg_femhead TAvg_num_mem TAvg_formal_credit inm i.year, ll(0)
-margins, predict(ystar(0,.)) dydx(*) post
+xtreg ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem inm i.year,  fe i(HHID)
 restore
 end
 bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
 
 
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Log_real_heckman_organic.doc", replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Log_nominal_heckman_organic.doc", replace word
+
+
+
+
+
+**********************************************
+*Level__heckman
+**********************************************
+
 capture program drop myboot	
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem formal_credit  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem formal_credit good_soil fair_soil   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem  i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem good fair  i.year) twostep
 predict yhat, xb
 predict inm, mills
+
 
 local time_avg "yhat"
 foreach x in `time_avg' {
 	bysort HHID : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit total_qty_w yhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem formal_credit       TAvg_total_qty_w TAvg_yhat TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert TAvg_hh_headage_mrk  TAvg_attend_sch TAvg_femhead TAvg_num_mem TAvg_formal_credit inm i.year, ll(0)
-margins, predict(ystar(0,.)) dydx(*) post
+xtreg total_qty_w yhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem inm i.year,  fe i(HHID)
 restore
 end
 bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
 
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Level__heckman_organic.doc", replace word
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Level__nominal_heckman_organic.doc", replace word
+
+
 tabstat total_qty_w subsidy_qty_w  yhat num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
+
+*************************************************************************************************************************************************************
+*************************************************************************************************************************************************************
 
 
 
@@ -356,137 +382,6 @@ tabstat total_qty_w subsidy_qty_w  yhat num_mem hh_headage  [aweight = weight], 
 
 
 
-******************************Using OLS Regression***********************************************************************************************************
-*************************************************************************************************************************************************************
-capture program drop myboot	
-program define myboot, rclass
-** CRE-TOBIT
- preserve 
-
-  
-heckman real_tpricefert_cens_mrk dist_admarc_w subsidy_qty_w maize_price_mr lland_holding  informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead worker num_mem safety_net lhhasset_value_w  i.year, select (commercial_dummy= subsidy_qty_w dist_admarc_w maize_price_mr lland_holding informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead  worker num_mem safety_net lhhasset_value_w org_fert good_soil fair_soil   i.year) twostep
-predict yhat, xb
-
-sum yhat, detail
-gen lyhat = log(yhat)
-gen ltotal_qty_w = log(total_qty_w + 1)
-local time_avg "lyhat ltotal_qty_w yhat"
-foreach x in `time_avg' {
-	bysort HHID : egen TAvg_`x' = mean(`x')
-}
-** CRE-TOBIT 
-xtreg ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem     annual_precipitation annual_mean_temp formal_credit informal_credit  i.year,  fe i(HHID)
-restore
-end
-bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
-
-
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Log_real_heckman_organic.doc", replace word
-
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Log_nominal_heckman_organic.doc", replace word
-
-
-
-
-
-**********************************************
-*Level__heckman
-**********************************************
-
-capture program drop myboot	
-program define myboot, rclass
-** CRE-TOBIT
- preserve 
-heckman real_tpricefert_cens_mrk dist_admarc_w subsidy_qty_w maize_price_mr lland_holding  informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead worker num_mem safety_net lhhasset_value_w i.year, select (commercial_dummy= subsidy_qty_w dist_admarc_w maize_price_mr lland_holding informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead  worker num_mem safety_net lhhasset_value_w org_fert good_soil fair_soil   i.year) twostep
-predict yhat, xb
-
-local time_avg "yhat"
-foreach x in `time_avg' {
-	bysort HHID : egen TAvg_`x' = mean(`x')
-}
-** CRE-TOBIT 
-xtreg total_qty_w yhat subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem  annual_precipitation annual_mean_temp formal_credit informal_credit i.year,  fe i(HHID)
-restore
-end
-bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
-
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Level__heckman_organic.doc", replace word
-outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Heckman\complete\Level__nominal_heckman_organic.doc", replace word
-
-
-tabstat total_qty_w subsidy_qty_w  yhat num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-*************************************************************************************************************************************************************
-*************************************************************************************************************************************************************
-
-
-
-
-
-
-
-******************************OLS Regression with org_fert*************************************************************************************
-*************************************************************************************************************************************************************
-capture program drop myboot	
-program define myboot, rclass
-** CRE-TOBIT
- preserve 
-
-  
-heckman real_tpricefert_cens_mrk dist_admarc_w subsidy_qty_w maize_price_mr lland_holding  informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead worker num_mem safety_net lhhasset_value_w org_fert  i.year, select (commercial_dummy= subsidy_qty_w dist_admarc_w maize_price_mr lland_holding informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead  worker num_mem safety_net lhhasset_value_w org_fert good_soil fair_soil   i.year) twostep
-predict yhat, xb
-
-sum yhat, detail
-gen lyhat = log(yhat)
-gen ltotal_qty_w = log(total_qty_w + 1)
-local time_avg "lyhat ltotal_qty_w yhat"
-foreach x in `time_avg' {
-	bysort HHID : egen TAvg_`x' = mean(`x')
-}
-** CRE-TOBIT 
-xtreg ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem org_fert    annual_precipitation annual_mean_temp formal_credit informal_credit  i.year,  fe i(HHID)
-restore
-end
-bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
-
-
-
-
-
-**********************************************
-*Level__heckman
-**********************************************
-
-capture program drop myboot	
-program define myboot, rclass
-** CRE-TOBIT
- preserve 
-heckman real_tpricefert_cens_mrk dist_admarc_w subsidy_qty_w maize_price_mr lland_holding  informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead worker num_mem safety_net lhhasset_value_w org_fert i.year, select (commercial_dummy= subsidy_qty_w dist_admarc_w maize_price_mr lland_holding informal_save formal_credit informal_credit ext_access attend_sch hh_headage_mrk femhead  worker num_mem safety_net lhhasset_value_w org_fert good_soil fair_soil   i.year) twostep
-predict yhat, xb
-
-local time_avg "yhat"
-foreach x in `time_avg' {
-	bysort HHID : egen TAvg_`x' = mean(`x')
-}
-** CRE-TOBIT 
-xtreg total_qty_w yhat subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem org_fert annual_precipitation annual_mean_temp formal_credit informal_credit i.year,  fe i(HHID)
-restore
-end
-bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
-
-
-tabstat total_qty_w subsidy_qty_w  yhat num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-*************************************************************************************************************************************************************
-*************************************************************************************************************************************************************
-
-
-
-
-
-
 
 
 
@@ -568,10 +463,10 @@ foreach x in `time_avg' {
 
 *log org_fert org_fert
 ** OLS with HH fixed effects
-xtreg ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem     annual_precipitation annual_mean_temp formal_credit informal_credit i.region i.year, fe i(HHID) cluster(HHID)
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem i.region i.year, fe i(HHID) cluster(HHID)
 
 ** OLS with HH fixed effects
-xtreg total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem  formal_credit informal_credit  annual_precipitation annual_mean_temp i.region i.year, fe i(HHID) cluster(HHID)
+xtreg total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem i.region i.year, fe i(HHID) cluster(HHID)
 
 tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
@@ -613,7 +508,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
 preserve 
-tobit total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem org_fert formal_credit informal_credit  annual_precipitation annual_mean_temp   TAvg_annual_precipitation TAvg_annual_mean_temp  TAvg_org_fert  TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_ext_access TAvg_femhead TAvg_attend_sch TAvg_safety_net TAvg_lhhasset_value_w TAvg_lland_holding TAvg_hh_headage_mrk TAvg_worker TAvg_num_mem TAvg_formal_credit TAvg_informal_credit  i.year, ll(0)
+tobit total_qty_w real_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem       TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert TAvg_hh_headage_mrk  TAvg_attend_sch TAvg_femhead TAvg_num_mem i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
@@ -637,7 +532,8 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-tobit ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr ext_access attend_sch femhead safety_net  lland_holding lhhasset_value_w hh_headage_mrk worker num_mem   org_fert  annual_precipitation annual_mean_temp formal_credit informal_credit   TAvg_annual_precipitation TAvg_annual_mean_temp  TAvg_org_fert  TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_ext_access TAvg_femhead TAvg_attend_sch TAvg_safety_net TAvg_lhhasset_value_w TAvg_lland_holding TAvg_hh_headage_mrk TAvg_worker TAvg_num_mem TAvg_formal_credit TAvg_informal_credit  i.year, ll(0)
+tobit ltotal_qty_w lreal_tpricefert_cens_mrk subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert hh_headage_mrk attend_sch femhead num_mem       TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert TAvg_hh_headage_mrk  TAvg_attend_sch TAvg_femhead TAvg_num_mem i.year, ll(0)
+
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end

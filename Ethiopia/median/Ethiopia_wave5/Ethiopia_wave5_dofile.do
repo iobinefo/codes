@@ -1449,6 +1449,9 @@ list hhid parcel_id  field_size soil_quality soil_qty_rev soil_qty_rev2 dup if d
 
 
 
+gen good = (soil_qty_rev2==1)
+gen fair = (soil_qty_rev2==2)
+
 ren saq03 woreda
 ren saq02 zones
 ren saq01 region
@@ -1472,12 +1475,15 @@ tab soil_qty_rev2, missing
 
 replace soil_qty_rev2= 1 if soil_qty_rev2==1.5
 tab soil_qty_rev2, missing
+tab good 
+tab fair
 
 la define soil 1 "Good" 2 "fair" 3 "poor"
 
 *la value soil soil_qty_rev2
 
-collapse (mean) soil_qty_rev2 , by (hhid)
+collapse (mean) soil_qty_rev2 (max) good fair, by (hhid)
+
 la var soil_qty_rev2 "1=Good 2= fair 3=Bad "
 save "${Ethiopia_GHS_W5_created_data}\soil_quality_2021.dta", replace
 
@@ -1583,9 +1589,11 @@ replace soil_qty_rev2= med_soil_region if soil_qty_rev2==.
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
 
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
+replace good = 0 if good ==.
+replace fair = 0 if fair ==.
 
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert good fair
 
 
 

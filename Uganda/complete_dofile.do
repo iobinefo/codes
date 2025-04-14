@@ -188,8 +188,8 @@ restore
 
 
 
-*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman18p.dta", clear
-use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18p.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman18p.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18p.dta", clear
 
 
 
@@ -206,12 +206,12 @@ keep if dummy==2
 sort HHID
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Real_Price_heckman18p.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Nominal_Price_heckman18p.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Real_Price_heckman18p.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\subset_Nominal_Price_heckman18p.dta", replace
 
 
-*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman18p.dta"
-merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18p.dta"
+merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman18p.dta"
+*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18p.dta"
 
 
 
@@ -236,8 +236,8 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk  real_maize_price_mr rea
 
 *formal_credit informal_credit safety_net
 
-*save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Real_Price_heckman18p.dta", replace
-save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Nominal_Price_heckman18p.dta", replace
+save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Real_Price_heckman18p.dta", replace
+*save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Nominal_Price_heckman18p.dta", replace
 
 
 

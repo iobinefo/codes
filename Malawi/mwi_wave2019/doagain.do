@@ -432,7 +432,7 @@ gen tpricefert  = total_valuefert /total_qty
 tab tpricefert
 
 gen tpricefert_cens  = tpricefert 
-replace tpricefert_cens = 700 if tpricefert_cens > 700 & tpricefert_cens < .
+replace tpricefert_cens = 3000 if tpricefert_cens > 3000 & tpricefert_cens < .
 replace tpricefert_cens = 100 if tpricefert_cens < 100
 tab tpricefert_cens, missing
 
@@ -1288,9 +1288,13 @@ replace soil_qty_rev2 = soil_qty_rev if dup>0
 list HHID plot_id  field_size_ha soil_quality soil_qty_rev soil_qty_rev2 dup if dup>0
 tab soil_qty_rev2, missing
 
+
+gen good = (soil_qty_rev==1)
+gen fair = (soil_qty_rev==2)
+
 replace soil_qty_rev2= 2 if soil_qty_rev2==.
 
-collapse (mean) soil_qty_rev2 , by (HHID)
+collapse (mean) soil_qty_rev2 (max) good fair , by (HHID)
 la define soil 1 "Good" 2 "fair" 3 "poor"
 
 la values soil soil_qty_rev2
@@ -1442,11 +1446,11 @@ save "${mwi_GHS_W4_created_data}\Malawi_wave4_completedata_2019.dta", replace
 
 
 *****************Appending all Malawi Datasets*****************
-use "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2010\Malawi_wave1_completedata_2010n.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2010\Malawi_wave1_completedata_2010.dta", clear
 
-append using "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2013\Malawi_wave2_completedata_2013n.dta" 
+append using "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2013\Malawi_wave2_completedata_2013.dta" 
 
-append using "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2016\Malawi_wave3_completedata_2016n.dta" 
+append using "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2016\Malawi_wave3_completedata_2016.dta" 
 
 append using "C:\Users\obine\Music\Documents\Project\codes\Malawi\mwi_wave2019\Malawi_wave4_completedata_2019.dta"
 
@@ -1456,7 +1460,7 @@ order year HHID
 
 
 
-
+misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding good fair
 
 
 
@@ -1495,11 +1499,11 @@ proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext
 tabstat total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding
+misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding good fair
 
 proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
 
-save "C:\Users\obine\Music\Documents\Project\codes\Malawi\Malawi_complete_datan.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Malawi\Malawi_complete_data.dta", replace
 
 

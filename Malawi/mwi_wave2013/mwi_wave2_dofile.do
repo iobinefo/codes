@@ -223,7 +223,7 @@ tab maize_price_mr,missing
 
 ren maize_price_mr real_maize_price
 
-gen maize_price_mr = real_maize_price // 0.4915783
+gen maize_price_mr = real_maize_price / 0.4915783
 
 
 
@@ -556,7 +556,7 @@ gen tpricefert = total_valuefert /total_qty
 tab tpricefert 
 
 gen tpricefert_cens = tpricefert 
-replace tpricefert_cens = 500 if tpricefert_cens > 500 & tpricefert_cens < .
+replace tpricefert_cens = 3000 if tpricefert_cens > 3000 & tpricefert_cens < .
 replace tpricefert_cens = 5 if tpricefert_cens < 5
 tab tpricefert_cens, missing
 
@@ -641,7 +641,7 @@ tab total_qty_w, missing
 sum total_qty total_qty_w, detail
 
 
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   //0.4915783
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   /0.4915783
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -1040,7 +1040,7 @@ sum hhasset_value hhasset_value_w, detail
 
 *summarize  hhasset_value_w hhasset_value_s , detail
 
-gen rea_hhvalue = hhasset_value_w   //0.4915783
+gen rea_hhvalue = hhasset_value_w   /0.4915783
 gen real_hhvalue = rea_hhvalue/1000
 sum hhasset_value_w real_hhvalue, detail
 keep HHID hhasset_value_w
@@ -1223,7 +1223,14 @@ replace soil_qty_rev2 = soil_qty_rev if dup>0
 list HHID occ  field_size_ha soil_quality soil_qty_rev soil_qty_rev2 dup if dup>0
 tab soil_qty_rev2, missing
 
-collapse (mean) soil_qty_rev2 , by (HHID)
+
+
+gen good = (soil_qty_rev2==1)
+gen fair = (soil_qty_rev2==2)
+
+collapse (mean) soil_qty_rev2 (max) good fair , by (HHID)
+
+
 la define soil 1 "Good" 2 "fair" 3 "poor"
 
 la value soil soil_qty_rev2
@@ -1356,10 +1363,10 @@ keep if _merge==3
 tabstat total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding
+misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding good fair
 
 proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
 
 
-save "${mwi_GHS_W2_created_data}\Malawi_wave2_completedata_2013n.dta", replace
+save "${mwi_GHS_W2_created_data}\Malawi_wave2_completedata_2013.dta", replace

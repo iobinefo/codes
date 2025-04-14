@@ -4,7 +4,7 @@
 
 
 use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Real_median.dta", clear
-*use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
+use  "C:\Users\obine\Music\Documents\Project\codes\Nigeria\complete\Nominal_median.dta", clear
 
 
 

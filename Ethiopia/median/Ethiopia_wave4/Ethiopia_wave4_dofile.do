@@ -1427,9 +1427,11 @@ keep if ag_rainy_18==1
 
 tab s2q17
 
+
 ren s2q17 soil_quality
 tab soil_quality, missing
 
+/*
 ren saq03 woreda
 ren saq02 zones
 ren saq01 region
@@ -1452,7 +1454,7 @@ tab soil_quality, missing
 
 *replace soil_qty_rev2= med_soil if soil_qty_rev2==.
 *tab soil_qty_rev2, missing
-
+*/
 
 
 
@@ -1480,8 +1482,8 @@ replace soil_qty_rev2 = soil_qty_rev if dup>0
 
 list hhid parcel_id  field_size soil_quality soil_qty_rev soil_qty_rev2 dup if dup>0
 
-
-
+gen good = (soil_qty_rev2==1)
+gen fair = (soil_qty_rev2==2)
 
 
 
@@ -1490,9 +1492,11 @@ la define soil 1 "Good" 2 "fair" 3 "poor"
 
 *la value soil soil_qty_rev2
 
-collapse (mean) soil_qty_rev2 , by (hhid)
+collapse (mean) soil_qty_rev2 (max) good fair , by (hhid)
 
 tab soil_qty_rev2, missing
+tab good, missing
+tab fair, missing
 
 
 la var soil_qty_rev2 "1=Good 2= fair 3=Bad "
@@ -1595,8 +1599,11 @@ replace soil_qty_rev2= med_soil_region if soil_qty_rev2==.
 
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
 
+replace good = 0 if good==.
 
-misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer 
+replace fair = 0 if fair==.
+
+misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer good fair
 
 
 

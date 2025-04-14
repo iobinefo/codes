@@ -265,7 +265,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 
 */
 tab tpricefert_cens_mrk, missing
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk // / 0.9126678
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk // 0.9126678
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -1121,7 +1121,7 @@ sum hhasset_value hhasset_value_w, detail
 
 
 
-gen rea_hhvalue = hhasset_value_w  // / 0.9126678
+gen rea_hhvalue = hhasset_value_w  // 0.9126678
 gen real_hhvalue = rea_hhvalue
 
 sum hhasset_value_w real_hhvalue, detail
@@ -1469,7 +1469,8 @@ replace soil_qty_rev2 = soil_qty_rev if dup>0
 
 list hhid parcelID  field_size soil_quality soil_qty_rev soil_qty_rev2 dup if dup>0
 
-
+gen good = (soil_qty_rev2==1)
+gen fair = (soil_qty_rev2==2)
 
 tab soil_qty_rev2, missing
 
@@ -1478,7 +1479,7 @@ la define soil 1 "Good" 2 "fair" 3 "poor"
 
 *la value soil soil_qty_rev2
 
-collapse (mean) soil_qty_rev2 , by (hhid)
+collapse (mean) soil_qty_rev2 (max) good fair , by (hhid)
 tab soil_qty_rev2, missing
 
 la var soil_qty_rev2 "1=Good 2= fair 3=Bad "
@@ -1598,9 +1599,12 @@ replace total_qty_w= 0 if total_qty_w==.
 egen median_soil = median(soil_qty_rev2)
 replace soil_qty_rev2= median_soil if soil_qty_rev2==.
 
+replace good = 0 if good ==.
+replace fair = 0 if fair ==.
 
 
-misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net
+
+misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit  total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net good fair
 
 *credit formal_save informal_save safety_net
 sum total_qty_w, detail
@@ -1621,7 +1625,7 @@ save "${Uganda_GHS_W6_created_data}\Uganda_wave6_complete_datap.dta", replace
 
 *****************Appending all Nigeria Datasets*****************
 use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave6\Uganda_wave6_complete_datap.dta"  ,clear
-append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave5\Uganda_wave5_complete_datapn.dta"
+append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave5\Uganda_wave5_complete_datap.dta"
 
 *append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave3\Uganda_wave3_complete_data.dta"
 
@@ -1639,10 +1643,10 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk  real_maize_price_mr rea
 
 
 
-misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net org_fert seed_dummy
+misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 formal_credit informal_credit real_maize_price_mr real_rice_price_mr  net_seller net_buyer safety_net org_fert seed_dummy good fair
 
 
 
 * safety_net
 
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\Nominal_Price_heckman18p.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\Real_Price_heckman18p.dta", replace

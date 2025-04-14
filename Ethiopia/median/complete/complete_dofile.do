@@ -64,12 +64,12 @@ gen float hhid1 = real(hhid)
 
 *log
 ** OLS with HH fixed effects
-xtreg ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation i.year, fe i(hhid1) cluster(hhid1)
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem  i.year, fe i(hhid1) cluster(hhid1)
 
 
 
 ** OLS with HH fixed effects
-xtreg total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation i.year, fe i(hhid1) cluster(hhid1)
+xtreg total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem i.year, fe i(hhid1) cluster(hhid1)
 
 tabstat total_qty_w real_tpricefert_cens_mrk [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
@@ -105,10 +105,7 @@ program define myboot, rclass
  preserve 
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation              TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_real_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_worker TAvg_formal_credit TAvg_informal_credit TAvg_org_fert i.year, ll(0)
-
-
-
+tobit ltotal_qty_w lreal_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem            TAvg_ltotal_qty_w TAvg_lreal_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue   TAvg_org_fert TAvg_hh_headage TAvg_attend_sch TAvg_femhead TAvg_num_mem i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 
 restore
@@ -126,9 +123,7 @@ program define myboot, rclass
 ** CRE-TOBIT
 preserve 
 
-tobit total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr ext_acess attend_sch femhead safety_net lland_holding real_hhvalue hh_headage  num_mem  worker formal_credit informal_credit org_fert  annual_mean_temp annual_precipitation              TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_ext_acess TAvg_attend_sch TAvg_femhead TAvg_safety_net TAvg_lland_holding TAvg_real_hhvalue TAvg_hh_headage  TAvg_num_mem TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_worker TAvg_formal_credit TAvg_informal_credit TAvg_org_fert i.year, ll(0)
-
-
+tobit total_qty_w real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem           TAvg_total_qty_w TAvg_real_tpricefert_cens_mrk TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue   TAvg_org_fert TAvg_hh_headage TAvg_attend_sch TAvg_femhead TAvg_num_mem i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end

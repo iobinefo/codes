@@ -1,5 +1,5 @@
 
-
+log using "C:\Users\obine\Music\Documents\Project\codes\Uganda_log_file.smcl", append
 
 use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Real_Price_heckman18p.dta", clear
 use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Nominal_Price_heckman18p.dta", clear
@@ -8,7 +8,7 @@ use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\complete\Nominal_Price
 
 tabstat total_qty_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
-misstable summarize femhead  ext_acess attend_sch total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer safety_net formal_credit informal_credit
+misstable summarize femhead  ext_acess attend_sch total_qty_w  real_tpricefert_cens_mrk mrk_dist_w num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer safety_net formal_credit informal_credit good fair
 
 
 
@@ -44,7 +44,143 @@ foreach x in `time_avg' {
 gen good_soil = (soil_qty_rev2==1)
 gen fair_soil = (soil_qty_rev2==2)
 
+reg total_qty_w good_soil fair_soil
+reg total_qty_w good fair
 
+
+
+********************************************
+*First Stage regression
+********************************************
+
+
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+
+
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert    year_2015 year_2018, select (commercial_dummy= mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  good_soil fair_soil  year_2015 year_2018) twostep
+predict yhat, xb
+predict imr, mills
+
+sum yhat , detail
+gen lyhat = log(yhat)
+gen ltotal_qty_w = log(total_qty_w + 1)
+local time_avg "lyhat ltotal_qty_w"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+tobit ltotal_qty_w lyhat mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert imr  TAvg_ltotal_qty_w TAvg_lyhat TAvg_mrk_dist_w TAvg_real_maize_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_org_fert year_2015 year_2018, ll(0)
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Log_real_heckman_original2.doc",  replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Log_nominal_heckman2.doc", replace word
+
+
+
+**************Level
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  year_2015 year_2018, select (commercial_dummy= mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  good_soil fair_soil  year_2015 year_2018) twostep
+predict yhat, xb
+predict imr, mills
+
+local time_avg "yhat"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+tobit total_qty_w yhat mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  imr  TAvg_total_qty_w TAvg_yhat TAvg_mrk_dist_w TAvg_real_maize_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_org_fert  year_2015 year_2018, ll(0)
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Level_real_heckman_original2.doc", replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Level_nominal_heckman2.doc", replace word
+
+
+
+tabstat total_qty_w yhat  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+
+
+
+********************************************
+*Second Stage regression
+********************************************
+
+
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+
+
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  attend_sch hh_headage femhead num_mem   year_2015 year_2018, select (commercial_dummy= mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  attend_sch hh_headage femhead num_mem  good_soil fair_soil  year_2015 year_2018) twostep
+predict yhat, xb
+predict imr, mills
+
+sum yhat, detail
+gen lyhat = log(yhat)
+gen ltotal_qty_w = log(total_qty_w + 1)
+local time_avg "lyhat ltotal_qty_w"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+tobit ltotal_qty_w lyhat mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  attend_sch hh_headage femhead num_mem imr  TAvg_ltotal_qty_w TAvg_lyhat TAvg_mrk_dist_w TAvg_real_maize_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_org_fert TAvg_attend_sch  TAvg_hh_headage TAvg_femhead TAvg_num_mem year_2015 year_2018, ll(0)
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Log_real_heckman_original2.doc",  replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Log_nominal_heckman2.doc", replace word
+
+
+
+**************Level
+capture program drop myboot	
+program define myboot, rclass
+** CRE-TOBIT
+ preserve 
+heckman real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  attend_sch hh_headage femhead num_mem   year_2015 year_2018, select (commercial_dummy= mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  attend_sch hh_headage femhead num_mem  good_soil fair_soil  year_2015 year_2018) twostep
+predict yhat, xb
+predict imr, mills
+
+
+local time_avg "yhat"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+** CRE-TOBIT 
+tobit total_qty_w yhat mrk_dist_w real_maize_price_mr land_holding real_hhvalue  org_fert  attend_sch hh_headage femhead num_mem imr  TAvg_total_qty_w TAvg_yhat TAvg_mrk_dist_w TAvg_real_maize_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_org_fert TAvg_attend_sch  TAvg_hh_headage TAvg_femhead TAvg_num_mem year_2015 year_2018, ll(0)
+margins, predict(ystar(0,.)) dydx(*) post
+restore
+end
+bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
+
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Level_real_heckman_original2.doc", replace word
+
+outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\results\Level_nominal_heckman2.doc", replace word
+
+
+
+tabstat total_qty_w yhat  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 ********************************************

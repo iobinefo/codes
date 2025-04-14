@@ -411,7 +411,7 @@ gen tpricefert  = total_valuefert /total_qty
 tab tpricefert 
 
 gen tpricefert_cens  = tpricefert 
-replace tpricefert_cens = 530 if tpricefert_cens > 530 & tpricefert_cens < .
+replace tpricefert_cens = 3000 if tpricefert_cens > 3000 & tpricefert_cens < .
 replace tpricefert_cens = 100 if tpricefert_cens < 100
 tab tpricefert_cens, missing
 
@@ -499,7 +499,7 @@ tab total_qty_w, missing
 sum total_qty total_qty_w, detail
 
 
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   //0.8133064
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk   /0.8133064
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -977,12 +977,12 @@ tab net_buyer,missing
 
 ren maize_price_mr real_maize_price
 
-gen maize_price_mr = real_maize_price // 0.8133064
+gen maize_price_mr = real_maize_price / 0.8133064
 
 
 ren rice_price_mr real_rice_price
 
-gen rice_price_mr = real_rice_price // 0.8133064
+gen rice_price_mr = real_rice_price / 0.8133064
 
 
 
@@ -1089,7 +1089,7 @@ sum hhasset_value hhasset_value_w, detail
 
 *summarize  hhasset_value_w hhasset_value_s , detail
 
-gen rea_hhvalue = hhasset_value_w   //0.8133064
+gen rea_hhvalue = hhasset_value_w   /0.8133064
 gen real_hhvalue = rea_hhvalue/1000
 sum hhasset_value_w real_hhvalue, detail
 keep HHID hhasset_value_w
@@ -1269,8 +1269,11 @@ list HHID plot_id  field_size_ha soil_quality soil_qty_rev soil_qty_rev2 dup if 
 tab soil_qty_rev2, missing
 
 
+gen good = (soil_qty_rev2 ==1)
+gen fair = (soil_qty_rev2==2)
 **************should we give missing values the median?
-collapse (mean) soil_qty_rev2 , by (HHID)
+collapse (mean) soil_qty_rev2 (max) good fair, by (HHID)
+
 la define soil 1 "Good" 2 "fair" 3 "poor"
 
 la values soil soil_qty_rev2
@@ -1388,12 +1391,12 @@ keep if _merge==3
 tabstat total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding
+misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding good fair
 
 proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
 
 
 
-save "${mwi_GHS_W3_created_data}\Malawi_wave3_completedata_2016n.dta", replace
+save "${mwi_GHS_W3_created_data}\Malawi_wave3_completedata_2016.dta", replace
 

@@ -30,18 +30,18 @@ tab dummy
 keep if dummy==4
 sort HHID
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Malawi\subset_Real_median", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Malawi\subset_Nominal_median", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Malawi\subset_Real_median", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Malawi\subset_Nominal_median", replace
 
 
 
-*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Malawi_complete_data.dta", gen(clean)
+merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Malawi_complete_data.dta", gen(clean)
 
-merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Malawi_complete_datan.dta", gen(clean)
+*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Malawi\Malawi_complete_datan.dta", gen(clean)
 drop if clean==2
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Malawi\Real_median.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Malawi\Nominal_median.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Malawi\Real_median.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Malawi\Nominal_median.dta", replace
 
 
 gen year_2010 = (year==2010)
@@ -54,11 +54,14 @@ gen commercial_dummy = (total_qty_w>0)
 tab commercial_dummy
 
 
+replace good = 0 if good ==.
+replace fair = 0 if fair ==.
+
 
 tabstat total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding
+misstable summarize subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2 total_qty_w subsidy_qty_w dist_admarc_w real_tpricefert_cens_mrk num_mem hh_headage_mrk worker maize_price_mr hhasset_value_w land_holding good fair
 
 proportion subsidy_dummy femhead informal_save formal_credit informal_credit ext_access attend_sch pry_edu finish_pry finish_sec safety_net net_seller net_buyer soil_qty_rev2
 
@@ -69,6 +72,6 @@ sum real_tpricefert_cens_mrk, detail
 
 
 
-*save "C:\Users\obine\Music\Documents\Project\codes\Malawi\complete\Real_median.dta", replace
-save "C:\Users\obine\Music\Documents\Project\codes\Malawi\complete\Nominal_median.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Malawi\complete\Real_median.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Malawi\complete\Nominal_median.dta", replace
 

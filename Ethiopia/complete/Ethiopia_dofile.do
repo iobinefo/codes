@@ -69,7 +69,7 @@ program define myboot, rclass
 ** CRE-TOBIT
  preserve 
 
-heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding org_fert good_soil fair_soil  i.year) twostep
 predict yhat, xb
 predict imr, mills
 
@@ -83,7 +83,7 @@ foreach x in `time_avg' {
 	bysort hhid : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit ltotal_qty_w lyhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  annual_mean_temp annual_precipitation   imr           TAvg_ltotal_qty_w TAvg_lyhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_org_fert i.year, ll(0)
+tobit ltotal_qty_w lyhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding org_fert   imr           TAvg_ltotal_qty_w TAvg_lyhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_org_fert i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
@@ -95,7 +95,7 @@ program define myboot, rclass
 ** CRE-TOBIT
  preserve 
 
-heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding  org_fert good_soil fair_soil  i.year) twostep
 predict yhat, xb
 predict imr, mills
 
@@ -104,7 +104,7 @@ foreach x in `time_avg' {
 	bysort hhid : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit total_qty_w yhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  annual_mean_temp annual_precipitation   imr           TAvg_total_qty_w TAvg_yhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_org_fert i.year, ll(0)
+tobit total_qty_w yhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding  org_fert  imr           TAvg_total_qty_w TAvg_yhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_org_fert i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end

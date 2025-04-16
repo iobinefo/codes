@@ -1612,7 +1612,7 @@ save "${Uganda_GHS_W6_created_data}\Uganda_wave6_complete_datap.dta", replace
 
 *****************Appending all Nigeria Datasets*****************
 use  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Uganda_wave6\Uganda_wave6_complete_datap.dta"  ,clear
-append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Uganda_wave5\Uganda_wave5_complete_datap.dta"
+append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Uganda_wave5\Uganda_wave5_complete_datapn.dta"
 
 *append using "C:\Users\obine\Music\Documents\Project\codes\Uganda\Uganda_wave3\Uganda_wave3_complete_data.dta"
 
@@ -1636,4 +1636,4 @@ misstable summarize femhead  ext_acess attend_sch    total_qty_w mrk_dist_w real
 
 * safety_net
 
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta", replace

@@ -155,8 +155,8 @@ restore
 
 
 
-use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta", clear
-*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta", clear
+*use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta", clear
+use "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta", clear
 
 
 
@@ -173,12 +173,12 @@ keep if dummy==2
 sort HHID
 
 
-save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Real_Price_median18p.dta", replace
-*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Nominal_Price_median18p.dta", replace
+*save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Real_Price_median18p.dta", replace
+save "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\subset_Nominal_Price_median18p.dta", replace
 
 
-merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta"
-*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta"
+*merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Real_Price_median18p.dta"
+merge 1:m HHID using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\Nominal_Price_median18p.dta"
 
 
 
@@ -203,8 +203,8 @@ tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk  real_maize_price_mr rea
 
 *formal_credit informal_credit safety_net
 
-save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Real_Price_median18p.dta", replace
-*save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Nominal_Price_median18p.dta", replace
+*save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Real_Price_median18p.dta", replace
+save  "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\complete\Nominal_Price_median18p.dta", replace
 
 
 

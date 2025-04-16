@@ -145,7 +145,7 @@ tab tpricefert
 sum tpricefert, detail
 
 gen tpricefert_cens = tpricefert
-replace tpricefert_cens = 30000 if tpricefert_cens > 30000 & tpricefert_cens < . //winzorizing at bottom 10%
+replace tpricefert_cens = 40000 if tpricefert_cens > 40000 & tpricefert_cens < . //winzorizing at bottom 10%
 replace tpricefert_cens =1758 if tpricefert_cens < 1758
 tab tpricefert_cens, missing  //winzorizing at top 1%
 
@@ -252,7 +252,7 @@ foreach v of varlist  tpricefert_cens_mrk  {
 
 */
 tab tpricefert_cens_mrk, missing
-gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk / 0.8762497
+gen rea_tpricefert_cens_mrk = tpricefert_cens_mrk // 0.8762497
 gen real_tpricefert_cens_mrk = rea_tpricefert_cens_mrk
 tab real_tpricefert_cens_mrk
 sum real_tpricefert_cens_mrk, detail
@@ -999,11 +999,11 @@ tab net_buyer,missing
 
 collapse  (max) net_seller net_buyer maize_price_mr rice_price_mr, by(HHID)
 
-gen rea_maize_price_mr = maize_price_mr    / 0.8762497
+gen rea_maize_price_mr = maize_price_mr    // 0.8762497
 gen real_maize_price_mr = rea_maize_price_mr
 tab real_maize_price_mr
 sum real_maize_price_mr, detail
-gen rea_rice_price_mr = rice_price_mr    / 0.8762497
+gen rea_rice_price_mr = rice_price_mr    // 0.8762497
 gen real_rice_price_mr = rea_rice_price_mr
 tab real_rice_price_mr
 sum real_rice_price_mr, detail
@@ -1075,7 +1075,7 @@ tab hhasset_value_w, missing
 sum hhasset_value hhasset_value_w, detail
 
 
-gen real_hhvalue = hhasset_value_w  / 0.8762497
+gen real_hhvalue = hhasset_value_w  // 0.8762497
 sum hhasset_value_w real_hhvalue, detail
 
 
@@ -1455,7 +1455,7 @@ misstable summarize femhead  ext_acess attend_sch  informal_credit formal_credit
 sum total_qty_w, detail
 sum real_tpricefert_cens_mrk, detail
 
-save "${Uganda_GHS_W5_created_data}\Uganda_wave5_complete_datap.dta", replace
+save "${Uganda_GHS_W5_created_data}\Uganda_wave5_complete_datapn.dta", replace
 
 
 

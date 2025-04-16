@@ -73,7 +73,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert  good fair   i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding  org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding  org_fert  good fair   i.year) twostep
 predict yhat, xb
 predict inm, mills
 
@@ -85,7 +85,7 @@ foreach x in `time_avg' {
 	bysort HHID : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert        TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert  inm i.year, ll(0)
+tobit ltotal_qty_w lyhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding  org_fert        TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding   TAvg_org_fert  inm i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
@@ -96,22 +96,33 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert good fair  i.year) twostep
+heckman real_tpricefert_cens_mrk  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding  org_fert   i.year, select (commercial_dummy=  subsidy_qty_w dist_admarc_w maize_price_mr lland_holding  org_fert good fair  i.year) twostep
 predict yhat, xb
 predict inm, mills
 
-local time_avg "yhat"
+
+foreach v of varlist  yhat  {
+	_pctile `v' [aw=weight] , p(1 95) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 5%"
+}
+
+
+local time_avg "yhat_w"
 foreach x in `time_avg' {
-	bysort HHID : egen TAvg_`x' = mean(`x')
+	bysort hhid : egen TAvg_`x' = mean(`x')
 }
 ** CRE-TOBIT 
-tobit total_qty_w yhat subsidy_qty_w dist_admarc_w maize_price_mr lland_holding lhhasset_value_w org_fert       TAvg_total_qty_w TAvg_yhat TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding TAvg_lhhasset_value_w  TAvg_org_fert inm i.year, ll(0)
+tobit total_qty_w yhat_w subsidy_qty_w dist_admarc_w maize_price_mr lland_holding  org_fert       TAvg_total_qty_w TAvg_yhat_w TAvg_subsidy_qty_w TAvg_dist_admarc_w TAvg_maize_price_mr TAvg_lland_holding   TAvg_org_fert inm i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
 bootstrap, reps(100) seed(123) cluster(HHID) idcluster(newid): myboot
 
-tabstat total_qty_w subsidy_qty_w  yhat num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+tabstat total_qty_w subsidy_qty_w yhat_w yhat num_mem hh_headage  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 

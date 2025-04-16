@@ -83,34 +83,6 @@ xtreg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_ac
 tabstat total_qty_w real_tpricefert_cens_mrk  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
-**********************************************Without org_fert**********************************************************
-*****************************************************************************************************************************************************
-
-*log
-** OLS with HH fixed effects
-xtreg ltotal_qty_w lreal_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
-
-
-
-** OLS with HH fixed effects
-xtreg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
-
-tabstat total_qty_w real_tpricefert_cens_mrk  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
-
-
-
-
-
-*************First Stage Regression
-
-reg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit soil_qty_rev2 i.year 
-
-reg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit good_soil fair_soil i.year 
-
-
-
-
-
 ********************************************
 *Using Functional Forms
 ********************************************
@@ -163,6 +135,36 @@ outreg2 using "C:\Users\obine\Music\Documents\Project\codes\Uganda\median\result
 
 
 tabstat total_qty_w real_tpricefert_cens_mrk  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+**********************************************Without org_fert**********************************************************
+*****************************************************************************************************************************************************
+
+*log
+** OLS with HH fixed effects
+xtreg ltotal_qty_w lreal_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
+
+
+
+** OLS with HH fixed effects
+xtreg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem formal_credit informal_credit i.year, fe i(hhid1) cluster(hhid1)
+
+tabstat total_qty_w real_tpricefert_cens_mrk  [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+
+
+
+
+*************First Stage Regression
+
+reg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit soil_qty_rev2 i.year 
+
+reg total_qty_w real_tpricefert_cens_mrk mrk_dist_w real_maize_price_mr ext_acess attend_sch femhead  safety_net land_holding lreal_hhvalue hh_headage  worker num_mem org_fert formal_credit informal_credit good_soil fair_soil i.year 
+
+
+
+
 
 
 

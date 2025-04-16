@@ -59,7 +59,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert   good_soil  i.year) twostep
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding  org_fert  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding  org_fert   good_soil  i.year) twostep
 predict yhat, xb
 predict imr, mills
 
@@ -71,7 +71,7 @@ foreach x in `time_avg' {
 }
 
 ** CRE-TOBIT 
-tobit ltotal_qty_w lyhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_org_fert imr i.year, ll(0)
+tobit ltotal_qty_w lyhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding  org_fert TAvg_ltotal_qty_w TAvg_lyhat TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding  TAvg_org_fert imr i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
@@ -83,7 +83,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding lreal_hhvalue org_fert good_soil  i.year) twostep
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding  org_fert  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr lland_holding  org_fert good_soil  i.year) twostep
 predict yhat, xb
 predict imr, mills
 
@@ -92,13 +92,32 @@ local time_avg "yhat"
 foreach x in `time_avg' {
 	bysort hhid : egen TAvg_`x' = mean(`x')
 }
+
+************winzonrizing fertilizer market price
+foreach v of varlist  yhat  {
+	_pctile `v' [aw=weight] , p(1 95) 
+	gen `v'_w=`v'
+	*replace  `v'_w = r(r1) if  `v'_w < r(r1) &  `v'_w!=.
+	replace  `v'_w = r(r2) if  `v'_w > r(r2) &  `v'_w!=.
+	local l`v' : var lab `v'
+	lab var  `v'_w  "`l`v'' - Winzorized top & bottom 5%"
+}
+
+
+local time_avg "yhat_w"
+foreach x in `time_avg' {
+	bysort hhid : egen TAvg_`x' = mean(`x')
+}
+
+
 ** CRE-TOBIT 
-tobit total_qty_w yhat subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  TAvg_total_qty_w TAvg_yhat TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_org_fert imr i.year, ll(0)
+tobit total_qty_w yhat_w subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding  org_fert  TAvg_total_qty_w TAvg_yhat_w TAvg_subsidy_qty_w TAvg_dist_market_w  TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding  TAvg_org_fert imr i.year, ll(0)
 margins, predict(ystar(0,.)) dydx(*) post
 restore
 end
 bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
 
+tabstat total_qty_w yhat yhat_w [aweight = weight], statistics( mean median sd min max ) columns(statistics)
 
 
 
@@ -339,7 +358,7 @@ capture program drop myboot
 program define myboot, rclass
 ** CRE-TOBIT
  preserve 
-heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem good_soil  i.year) twostep
+heckman real_tpricefert_cens_mrk subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue  org_fert hh_headage attend_sch femhead num_mem  i.year, select (commercial_dummy= subsidy_qty_w dist_market_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem good_soil  i.year) twostep
 predict yhat, xb
 predict imr, mills
 

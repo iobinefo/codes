@@ -4575,3 +4575,1054 @@ and rerun {bf:bootstrap}.{p_end}
 {txt}end of do-file
 
 {com}. exit, clear
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\obine\Music\Documents\Project\codes\Ethiopia2_log_file.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}15 Apr 2025, 15:39:19
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_price21p.dta", clear
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. 
+. tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+{txt}{ralign 12:Variable} {...}
+{c |}      Mean       p50        SD       Min       Max
+{hline 13}{c +}{hline 50}
+{ralign 12:total_qty_w} {...}
+{c |}{...}
+ {res} 83.53299        20  223.9396         0      5150
+{txt}{ralign 12:mrk_dist_w} {...}
+{c |}{...}
+ {res} 10.81569         9  7.433712         0        60
+{txt}{ralign 12:real_tpric~k} {...}
+{c |}{...}
+ {res} 13.32978      16.4  21.21731         0  1355.305
+{txt}{ralign 12:real_maize~r} {...}
+{c |}{...}
+ {res} 273.9273        26   707.651  17.67943      3000
+{txt}{ralign 12:real_rice_~r} {...}
+{c |}{...}
+ {res}  432.002  53.03829  1112.031        45      6000
+{txt}{ralign 12:num_mem} {...}
+{c |}{...}
+ {res} 5.572053         5  2.207343         1        20
+{txt}{ralign 12:hh_headage} {...}
+{c |}{...}
+ {res} 49.77197        46  11.18496        22        97
+{txt}{ralign 12:real_hhvalue} {...}
+{c |}{...}
+ {res} 5041.943      2221  10142.36 -519.7752  179269.4
+{txt}{ralign 12:worker} {...}
+{c |}{...}
+ {res} 3.137488         3  1.578493         0        10
+{txt}{ralign 12:land_holding} {...}
+{c |}{...}
+ {res} 1.167866   .758317  1.200723   .062511    6.6006
+{txt}{hline 13}{c BT}{hline 50}
+
+{com}. 
+. 
+. 
+. misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert informal_save formal_bank
+{txt}(variables nonmissing or string)
+
+{com}. 
+. 
+. *replace hh_headage = 66 if hh_headage >66 //bottom 90%
+. replace land_holding = 2.341905 if land_holding >2.341905 //bottom 90%
+{txt}(290 real changes made)
+
+{com}.  
+. replace real_hhvalue = 0 if real_hhvalue <=0 //bottom 90%
+{txt}(109 real changes made)
+
+{com}. gen lland_holding = log(land_holding)
+{txt}
+{com}. gen lreal_hhvalue = log(real_hhvalue  + 1)
+{txt}
+{com}. 
+. *histogram lreal_hhvalue, width(5) frequency normal
+. *histogram land_holding, width(5) frequency normal
+. sum real_hhvalue, detail
+
+               {txt}total value of household asset
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}        0              0
+{txt} 5%    {res}        0              0
+{txt}10%    {res}        0              0       {txt}Obs         {res}      2,900
+{txt}25%    {res}        0              0       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}   1316.5                      {txt}Mean          {res} 5260.394
+                        {txt}Largest       Std. dev.     {res} 13573.54
+{txt}75%    {res}     6629       179269.4
+{txt}90%    {res}    12870       179269.4       {txt}Variance      {res} 1.84e+08
+{txt}95%    {res}    18496       179269.4       {txt}Skewness      {res} 9.167063
+{txt}99%    {res} 37157.74       179269.4       {txt}Kurtosis      {res} 109.0722
+{txt}
+{com}. sum land_holding, detail
+
+                  {txt}land holding in hectares
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}  .062511        .062511
+{txt} 5%    {res}   .06282        .062511
+{txt}10%    {res}  .106242        .062511       {txt}Obs         {res}      2,900
+{txt}25%    {res}   .26352        .062511       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}  .618245                      {txt}Mean          {res} .8672106
+                        {txt}Largest       Std. dev.     {res} .7377296
+{txt}75%    {res} 1.334435       2.341905
+{txt}90%    {res} 2.341905       2.341905       {txt}Variance      {res}  .544245
+{txt}95%    {res} 2.341905       2.341905       {txt}Skewness      {res} .8463143
+{txt}99%    {res} 2.341905       2.341905       {txt}Kurtosis      {res} 2.432526
+{txt}
+{com}. sum lland_holding, detail
+
+                        {txt}lland_holding
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}-2.772413      -2.772413
+{txt} 5%    {res}-2.767482      -2.772413
+{txt}10%    {res}-2.242058      -2.772413       {txt}Obs         {res}      2,900
+{txt}25%    {res}-1.333626      -2.772413       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}-.4808729                      {txt}Mean          {res}-.6039238
+                        {txt}Largest       Std. dev.     {res} 1.065231
+{txt}75%    {res} .2885079       .8509647
+{txt}90%    {res} .8509647       .8509647       {txt}Variance      {res} 1.134717
+{txt}95%    {res} .8509647       .8509647       {txt}Skewness      {res} -.429793
+{txt}99%    {res} .8509647       .8509647       {txt}Kurtosis      {res} 2.240959
+{txt}
+{com}. 
+. 
+. gen good_soil = (soil_qty_rev2==1)
+{txt}
+{com}. gen fair_soil = (soil_qty_rev2==2)
+{txt}
+{com}. 
+. sum real_tpricefert_cens_mrk, detail
+
+      {txt}price of commercial fertilizer purchased in naira
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}        0              0
+{txt} 5%    {res}        0              0
+{txt}10%    {res}        0              0       {txt}Obs         {res}      2,900
+{txt}25%    {res}        0              0       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}        0                      {txt}Mean          {res} 11.70962
+                        {txt}Largest       Std. dev.     {res} 32.84718
+{txt}75%    {res} 21.21532       219.2249
+{txt}90%    {res} 26.51914            650       {txt}Variance      {res} 1078.937
+{txt}95%    {res}       30            650       {txt}Skewness      {res} 28.81431
+{txt}99%    {res} 44.88216       1355.305       {txt}Kurtosis      {res} 1065.092
+{txt}
+{com}. 
+. local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert annual_mean_temp annual_precipitation informal_save formal_save formal_bank"
+{txt}
+{com}. 
+. foreach x in `time_avg' {c -(}
+{txt}  2{com}. 
+.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt}  3{com}. 
+. {c )-}
+{txt}
+{com}. 
+. 
+. *****************************************
+. *Variables for model
+. 
+. *subsidy_qty_w dist_cens_w  real_maize_price_mr  real_hhvalue field_size_ha_w org_fert
+. 
+. *subsidy_qty_w dist_cens_w  real_maize_price_mr real_hhvalue field_size_ha_w org_fert hh_headage_mrk attend_sch femhead 
+. 
+. *subsidy_qty_w dist_cens_w  real_maize_price_mr real_hhvalue field_size_ha_w org_fert hh_headage_mrk attend_sch femhead num_mem
+. 
+. 
+. *Additional Variables
+. 
+. *hh_headage_mrk worker real_rice_price_mr formal_save formal_bank ext_acess attend_sch safety_net net_seller net_buyer soil_qty_rev2
+. 
+. 
+. reg total_qty_w good fair
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     2,900
+{txt}{hline 13}{c +}{hline 34}   F(2, 2897)      = {res}     1.41
+{txt}       Model {c |} {res}  123112.12         2  61556.0599   {txt}Prob > F        ={res}    0.2439
+{txt}    Residual {c |} {res}  126334948     2,897  43608.8879   {txt}R-squared       ={res}    0.0010
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0003
+{txt}       Total {c |} {res}  126458060     2,899  43621.2696   {txt}Root MSE        =   {res} 208.83
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1} total_qty_w{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}good_soil {c |}{col 14}{res}{space 2} 22.30637{col 26}{space 2} 13.66553{col 37}{space 1}    1.63{col 46}{space 3}0.103{col 54}{space 4}-4.488783{col 67}{space 3} 49.10151
+{txt}{space 3}fair_soil {c |}{col 14}{res}{space 2}  19.5178{col 26}{space 2} 12.75704{col 37}{space 1}    1.53{col 46}{space 3}0.126{col 54}{space 4}-5.495987{col 67}{space 3} 44.53158
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}   41.205{col 26}{space 2} 11.71046{col 37}{space 1}    3.52{col 46}{space 3}0.000{col 54}{space 4} 18.24333{col 67}{space 3} 64.16667
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. ********************************************
+. *********Significant for only nominal at the log form
+. capture program drop myboot     
+{txt}
+{com}. program define myboot, rclass
+{txt}  1{com}. ** CRE-TOBIT
+.  preserve 
+{txt}  2{com}. 
+. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+{txt}  3{com}. predict yhat, xb
+{txt}  4{com}. predict imr, mills
+{txt}  5{com}. 
+. gen lyhat = log(yhat)
+{txt}  6{com}. gen ltotal_qty_w = log(total_qty_w + 1)
+{txt}  7{com}. 
+. *histogram total_qty_w, width(50) frequency normal
+. *histogram ltotal_qty_w, width(5) frequency normal
+. local time_avg "lyhat ltotal_qty_w"
+{txt}  8{com}. foreach x in `time_avg' {c -(}
+{txt}  9{com}.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt} 10{com}. {c )-}
+{txt} 11{com}. ** CRE-TOBIT 
+. tobit ltotal_qty_w lyhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  annual_mean_temp annual_precipitation   imr           TAvg_ltotal_qty_w TAvg_lyhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_org_fert i.year, ll(0)
+{txt} 12{com}. margins, predict(ystar(0,.)) dydx(*) post
+{txt} 13{com}. restore
+{txt} 14{com}. end
+{txt}
+{com}. bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+{res}{txt}(running {bf:myboot} on estimation sample)
+
+{p 0 9 2}
+warning: {bf:myboot} does not set {bf:e(sample)}, so no 
+observations will be excluded from the resampling because of 
+missing values or other reasons. To exclude observations, press 
+Break, save the data, drop any observations that are to be excluded, 
+and rerun {bf:bootstrap}.{p_end}
+{res}
+{text}Bootstrap replications ({result:100}){text}: {res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}10{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}20{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}30{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}40{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}50{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}60{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}70{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}80{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}90{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}100{text} done
+{res}
+{txt}{col 1}Average marginal effects{col 58}{lalign 13:Number of obs}{col 71} = {res}{ralign 5:2,900}
+{txt}{col 58}{lalign 13:Replications}{col 71} = {res}{ralign 5:100}
+
+{txt}{ralign 91:(Replications based on {res:1,450} clusters in {res:hhid})}
+{hline 26}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 27}{c |}   Observed{col 39}   Bootstrap{col 67}         Norm{col 80}al-based
+{col 27}{c |} coefficient{col 39}  std. err.{col 51}      z{col 59}   P>|z|{col 67}     [95% con{col 80}f. interval]
+{hline 26}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 20}lyhat {c |}{col 27}{res}{space 2}-1.946937{col 39}{space 2} 3.731262{col 50}{space 1}   -0.52{col 59}{space 3}0.602{col 67}{space 4}-9.260077{col 80}{space 3} 5.366202
+{txt}{space 12}dist_admarc_w {c |}{col 27}{res}{space 2}  .009093{col 39}{space 2} .0037832{col 50}{space 1}    2.40{col 59}{space 3}0.016{col 67}{space 4}  .001678{col 80}{space 3} .0165079
+{txt}{space 6}real_maize_price_mr {c |}{col 27}{res}{space 2} .0002722{col 39}{space 2} .0001746{col 50}{space 1}    1.56{col 59}{space 3}0.119{col 67}{space 4}  -.00007{col 80}{space 3} .0006144
+{txt}{space 7}real_rice_price_mr {c |}{col 27}{res}{space 2}-.0001921{col 39}{space 2}  .000168{col 50}{space 1}   -1.14{col 59}{space 3}0.253{col 67}{space 4}-.0005215{col 80}{space 3} .0001372
+{txt}{space 13}land_holding {c |}{col 27}{res}{space 2}  .037305{col 39}{space 2} .4777642{col 50}{space 1}    0.08{col 59}{space 3}0.938{col 67}{space 4}-.8990956{col 80}{space 3} .9737055
+{txt}{space 13}real_hhvalue {c |}{col 27}{res}{space 2} 9.42e-06{col 39}{space 2} 7.89e-06{col 50}{space 1}    1.19{col 59}{space 3}0.232{col 67}{space 4}-6.04e-06{col 80}{space 3} .0000249
+{txt}{space 17}org_fert {c |}{col 27}{res}{space 2}-.3632583{col 39}{space 2} .3868881{col 50}{space 1}   -0.94{col 59}{space 3}0.348{col 67}{space 4}-1.121545{col 80}{space 3} .3950285
+{txt}{space 9}annual_mean_temp {c |}{col 27}{res}{space 2}-.0038169{col 39}{space 2} .0238956{col 50}{space 1}   -0.16{col 59}{space 3}0.873{col 67}{space 4}-.0506514{col 80}{space 3} .0430175
+{txt}{space 5}annual_precipitation {c |}{col 27}{res}{space 2} .0033658{col 39}{space 2} .0023659{col 50}{space 1}    1.42{col 59}{space 3}0.155{col 67}{space 4}-.0012714{col 80}{space 3} .0080029
+{txt}{space 22}imr {c |}{col 27}{res}{space 2}-1.099639{col 39}{space 2} .2652376{col 50}{space 1}   -4.15{col 59}{space 3}0.000{col 67}{space 4}-1.619495{col 80}{space 3} -.579783
+{txt}{space 8}TAvg_ltotal_qty_w {c |}{col 27}{res}{space 2} .8255618{col 39}{space 2} .0443367{col 50}{space 1}   18.62{col 59}{space 3}0.000{col 67}{space 4} .7386635{col 80}{space 3}   .91246
+{txt}{space 15}TAvg_lyhat {c |}{col 27}{res}{space 2} 1.326085{col 39}{space 2} 3.309292{col 50}{space 1}    0.40{col 59}{space 3}0.689{col 67}{space 4}-5.160008{col 80}{space 3} 7.812177
+{txt}{space 7}TAvg_dist_admarc_w {c |}{col 27}{res}{space 2}-.0059721{col 39}{space 2} .0034117{col 50}{space 1}   -1.75{col 59}{space 3}0.080{col 67}{space 4} -.012659{col 80}{space 3} .0007148
+{txt}{space 1}TAvg_real_maize_price_mr {c |}{col 27}{res}{space 2}-.0000341{col 39}{space 2} .0001743{col 50}{space 1}   -0.20{col 59}{space 3}0.845{col 67}{space 4}-.0003757{col 80}{space 3} .0003076
+{txt}{space 2}TAvg_real_rice_price_mr {c |}{col 27}{res}{space 2} .0000212{col 39}{space 2}   .00015{col 50}{space 1}    0.14{col 59}{space 3}0.888{col 67}{space 4}-.0002728{col 80}{space 3} .0003152
+{txt}{space 8}TAvg_land_holding {c |}{col 27}{res}{space 2}-.5186172{col 39}{space 2} .4105111{col 50}{space 1}   -1.26{col 59}{space 3}0.206{col 67}{space 4}-1.323204{col 80}{space 3} .2859698
+{txt}{space 8}TAvg_real_hhvalue {c |}{col 27}{res}{space 2}-5.27e-06{col 39}{space 2} 7.31e-06{col 50}{space 1}   -0.72{col 59}{space 3}0.471{col 67}{space 4}-.0000196{col 80}{space 3} 9.05e-06
+{txt}{space 4}TAvg_annual_mean_temp {c |}{col 27}{res}{space 2} .0026584{col 39}{space 2} .0237421{col 50}{space 1}    0.11{col 59}{space 3}0.911{col 67}{space 4}-.0438753{col 80}{space 3} .0491921
+{txt}TAvg_annual_precipitation {c |}{col 27}{res}{space 2}-.0033008{col 39}{space 2} .0023688{col 50}{space 1}   -1.39{col 59}{space 3}0.163{col 67}{space 4}-.0079435{col 80}{space 3} .0013418
+{txt}{space 12}TAvg_org_fert {c |}{col 27}{res}{space 2}-.0619153{col 39}{space 2} .2756697{col 50}{space 1}   -0.22{col 59}{space 3}0.822{col 67}{space 4}-.6022179{col 80}{space 3} .4783874
+{txt}{space 25} {c |}
+{space 21}year {c |}
+{space 20}2021  {c |}{col 27}{res}{space 2}-.0388605{col 39}{space 2} .6829364{col 50}{space 1}   -0.06{col 59}{space 3}0.955{col 67}{space 4}-1.377391{col 80}{space 3}  1.29967
+{txt}{hline 26}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. 
+. *Level
+. capture program drop myboot     
+{txt}
+{com}. program define myboot, rclass
+{txt}  1{com}. ** CRE-TOBIT
+.  preserve 
+{txt}  2{com}. 
+. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+{txt}  3{com}. predict yhat, xb
+{txt}  4{com}. predict imr, mills
+{txt}  5{com}. 
+. local time_avg "yhat"
+{txt}  6{com}. foreach x in `time_avg' {c -(}
+{txt}  7{com}.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt}  8{com}. {c )-}
+{txt}  9{com}. ** CRE-TOBIT 
+. tobit total_qty_w yhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  annual_mean_temp annual_precipitation   imr           TAvg_total_qty_w TAvg_yhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_org_fert i.year, ll(0)
+{txt} 10{com}. margins, predict(ystar(0,.)) dydx(*) post
+{txt} 11{com}. restore
+{txt} 12{com}. end
+{txt}
+{com}. bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+{res}{txt}(running {bf:myboot} on estimation sample)
+
+{p 0 9 2}
+warning: {bf:myboot} does not set {bf:e(sample)}, so no 
+observations will be excluded from the resampling because of 
+missing values or other reasons. To exclude observations, press 
+Break, save the data, drop any observations that are to be excluded, 
+and rerun {bf:bootstrap}.{p_end}
+{res}
+{text}Bootstrap replications ({result:100}){text}: {res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}10{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}20{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}30{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}40{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}50{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}60{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}70{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}80{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}90{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}100{text} done
+{res}
+{txt}{col 1}Average marginal effects{col 58}{lalign 13:Number of obs}{col 71} = {res}{ralign 5:2,900}
+{txt}{col 58}{lalign 13:Replications}{col 71} = {res}{ralign 5:100}
+
+{txt}{ralign 91:(Replications based on {res:1,450} clusters in {res:hhid})}
+{hline 26}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 27}{c |}   Observed{col 39}   Bootstrap{col 67}         Norm{col 80}al-based
+{col 27}{c |} coefficient{col 39}  std. err.{col 51}      z{col 59}   P>|z|{col 67}     [95% con{col 80}f. interval]
+{hline 26}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 21}yhat {c |}{col 27}{res}{space 2}-5.092288{col 39}{space 2} 12.13839{col 50}{space 1}   -0.42{col 59}{space 3}0.675{col 67}{space 4} -28.8831{col 80}{space 3} 18.69852
+{txt}{space 12}dist_admarc_w {c |}{col 27}{res}{space 2} .1916305{col 39}{space 2} .2399577{col 50}{space 1}    0.80{col 59}{space 3}0.425{col 67}{space 4}-.2786779{col 80}{space 3} .6619389
+{txt}{space 6}real_maize_price_mr {c |}{col 27}{res}{space 2} .0249254{col 39}{space 2}  .011854{col 50}{space 1}    2.10{col 59}{space 3}0.035{col 67}{space 4} .0016921{col 80}{space 3} .0481587
+{txt}{space 7}real_rice_price_mr {c |}{col 27}{res}{space 2}-.0109048{col 39}{space 2} .0277726{col 50}{space 1}   -0.39{col 59}{space 3}0.695{col 67}{space 4} -.065338{col 80}{space 3} .0435285
+{txt}{space 13}land_holding {c |}{col 27}{res}{space 2}-5.689842{col 39}{space 2} 128.8991{col 50}{space 1}   -0.04{col 59}{space 3}0.965{col 67}{space 4}-258.3275{col 80}{space 3} 246.9478
+{txt}{space 13}real_hhvalue {c |}{col 27}{res}{space 2} .0007218{col 39}{space 2} .0014141{col 50}{space 1}    0.51{col 59}{space 3}0.610{col 67}{space 4}-.0020499{col 80}{space 3} .0034934
+{txt}{space 17}org_fert {c |}{col 27}{res}{space 2}-32.22419{col 39}{space 2} 100.6061{col 50}{space 1}   -0.32{col 59}{space 3}0.749{col 67}{space 4}-229.4086{col 80}{space 3} 164.9602
+{txt}{space 9}annual_mean_temp {c |}{col 27}{res}{space 2} 2.381196{col 39}{space 2} 4.272135{col 50}{space 1}    0.56{col 59}{space 3}0.577{col 67}{space 4}-5.992036{col 80}{space 3} 10.75443
+{txt}{space 5}annual_precipitation {c |}{col 27}{res}{space 2} .6118641{col 39}{space 2} .3626202{col 50}{space 1}    1.69{col 59}{space 3}0.092{col 67}{space 4}-.0988585{col 80}{space 3} 1.322587
+{txt}{space 22}imr {c |}{col 27}{res}{space 2}-72.41662{col 39}{space 2} 20.66469{col 50}{space 1}   -3.50{col 59}{space 3}0.000{col 67}{space 4}-112.9187{col 80}{space 3}-31.91458
+{txt}{space 9}TAvg_total_qty_w {c |}{col 27}{res}{space 2} .4320422{col 39}{space 2} .0254468{col 50}{space 1}   16.98{col 59}{space 3}0.000{col 67}{space 4} .3821674{col 80}{space 3}  .481917
+{txt}{space 16}TAvg_yhat {c |}{col 27}{res}{space 2}-4.375427{col 39}{space 2} 161.9837{col 50}{space 1}   -0.03{col 59}{space 3}0.978{col 67}{space 4}-321.8577{col 80}{space 3} 313.1068
+{txt}{space 7}TAvg_dist_admarc_w {c |}{col 27}{res}{space 2} -.102164{col 39}{space 2} 1.538116{col 50}{space 1}   -0.07{col 59}{space 3}0.947{col 67}{space 4}-3.116816{col 80}{space 3} 2.912488
+{txt}{space 1}TAvg_real_maize_price_mr {c |}{col 27}{res}{space 2}-.0001318{col 39}{space 2} .2100802{col 50}{space 1}   -0.00{col 59}{space 3}0.999{col 67}{space 4}-.4118815{col 80}{space 3} .4116179
+{txt}{space 2}TAvg_real_rice_price_mr {c |}{col 27}{res}{space 2}-.0048357{col 39}{space 2} .0535729{col 50}{space 1}   -0.09{col 59}{space 3}0.928{col 67}{space 4}-.1098366{col 80}{space 3} .1001652
+{txt}{space 8}TAvg_land_holding {c |}{col 27}{res}{space 2} -8.19833{col 39}{space 2} 454.3005{col 50}{space 1}   -0.02{col 59}{space 3}0.986{col 67}{space 4} -898.611{col 80}{space 3} 882.2143
+{txt}{space 8}TAvg_real_hhvalue {c |}{col 27}{res}{space 2} .0013386{col 39}{space 2} .0335501{col 50}{space 1}    0.04{col 59}{space 3}0.968{col 67}{space 4}-.0644184{col 80}{space 3} .0670956
+{txt}{space 4}TAvg_annual_mean_temp {c |}{col 27}{res}{space 2}-2.846359{col 39}{space 2}  4.32125{col 50}{space 1}   -0.66{col 59}{space 3}0.510{col 67}{space 4}-11.31585{col 80}{space 3} 5.623135
+{txt}TAvg_annual_precipitation {c |}{col 27}{res}{space 2}-.6139731{col 39}{space 2} .3628773{col 50}{space 1}   -1.69{col 59}{space 3}0.091{col 67}{space 4}-1.325199{col 80}{space 3} .0972533
+{txt}{space 12}TAvg_org_fert {c |}{col 27}{res}{space 2}        0{col 39}{txt}  (omitted)
+{space 25} {c |}
+{space 21}year {c |}
+{space 20}2021  {c |}{col 27}{res}{space 2}        .{col 39}{txt}  (not estimable)
+{hline 26}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+{res}
+{txt}Heckman selection model -- two-step estimates   Number of obs     = {res}     2,900
+{txt}(regression model with sample selection)              Selected    = {res}     1,427
+                                                {txt}      Nonselected = {res}     1,473
+
+                                                {txt}Wald chi2({res}7{txt})      =  {res}    10.36
+                                                {txt}Prob > chi2       =     {res}0.1692
+
+{txt}{hline 25}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 26}{c |} Coefficient{col 38}  Std. err.{col 50}      z{col 58}   P>|z|{col 66}     [95% con{col 79}f. interval]
+{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}real_tpricefert_cens_mrk {txt}{c |}
+{space 11}dist_admarc_w {c |}{col 26}{res}{space 2} .0076091{col 38}{space 2} .0385911{col 49}{space 1}    0.20{col 58}{space 3}0.844{col 66}{space 4}-.0680281{col 79}{space 3} .0832462
+{txt}{space 5}real_maize_price_mr {c |}{col 26}{res}{space 2} .0022102{col 38}{space 2} .0025563{col 49}{space 1}    0.86{col 58}{space 3}0.387{col 66}{space 4}   -.0028{col 79}{space 3} .0072204
+{txt}{space 6}real_rice_price_mr {c |}{col 26}{res}{space 2}-.0015985{col 38}{space 2} .0017264{col 49}{space 1}   -0.93{col 58}{space 3}0.354{col 66}{space 4}-.0049821{col 79}{space 3} .0017851
+{txt}{space 12}land_holding {c |}{col 26}{res}{space 2}-.8633639{col 38}{space 2} 3.758338{col 49}{space 1}   -0.23{col 58}{space 3}0.818{col 66}{space 4} -8.22957{col 79}{space 3} 6.502842
+{txt}{space 12}real_hhvalue {c |}{col 26}{res}{space 2} .0002111{col 38}{space 2} .0000875{col 49}{space 1}    2.41{col 58}{space 3}0.016{col 66}{space 4} .0000396{col 79}{space 3} .0003825
+{txt}{space 16}org_fert {c |}{col 26}{res}{space 2}-2.417052{col 38}{space 2} 7.037992{col 49}{space 1}   -0.34{col 58}{space 3}0.731{col 66}{space 4}-16.21126{col 79}{space 3} 11.37716
+{txt}{space 24} {c |}
+{space 20}year {c |}
+{space 19}2021  {c |}{col 26}{res}{space 2}-5.774945{col 38}{space 2} 3.224438{col 49}{space 1}   -1.79{col 58}{space 3}0.073{col 66}{space 4}-12.09473{col 79}{space 3} .5448374
+{txt}{space 24} {c |}
+{space 19}_cons {c |}{col 26}{res}{space 2} 27.00873{col 38}{space 2} 17.92471{col 49}{space 1}    1.51{col 58}{space 3}0.132{col 66}{space 4} -8.12306{col 79}{space 3} 62.14052
+{txt}{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}commercial_dummy         {txt}{c |}
+{space 11}dist_admarc_w {c |}{col 26}{res}{space 2} -.003292{col 38}{space 2} .0005524{col 49}{space 1}   -5.96{col 58}{space 3}0.000{col 66}{space 4}-.0043746{col 79}{space 3}-.0022094
+{txt}{space 5}real_maize_price_mr {c |}{col 26}{res}{space 2}-.0001953{col 38}{space 2} .0000501{col 49}{space 1}   -3.90{col 58}{space 3}0.000{col 66}{space 4}-.0002935{col 79}{space 3}-.0000971
+{txt}{space 6}real_rice_price_mr {c |}{col 26}{res}{space 2}  .000189{col 38}{space 2} .0000346{col 49}{space 1}    5.46{col 58}{space 3}0.000{col 66}{space 4} .0001212{col 79}{space 3} .0002568
+{txt}{space 12}land_holding {c |}{col 26}{res}{space 2} .4956829{col 38}{space 2} .0353438{col 49}{space 1}   14.02{col 58}{space 3}0.000{col 66}{space 4} .4264103{col 79}{space 3} .5649556
+{txt}{space 12}real_hhvalue {c |}{col 26}{res}{space 2}-1.22e-06{col 38}{space 2} 1.97e-06{col 49}{space 1}   -0.62{col 58}{space 3}0.536{col 66}{space 4}-5.09e-06{col 79}{space 3} 2.64e-06
+{txt}{space 16}org_fert {c |}{col 26}{res}{space 2} .7509185{col 38}{space 2} .0551862{col 49}{space 1}   13.61{col 58}{space 3}0.000{col 66}{space 4} .6427556{col 79}{space 3} .8590814
+{txt}{space 15}good_soil {c |}{col 26}{res}{space 2} -.089669{col 38}{space 2} .0900454{col 49}{space 1}   -1.00{col 58}{space 3}0.319{col 66}{space 4}-.2661548{col 79}{space 3} .0868168
+{txt}{space 15}fair_soil {c |}{col 26}{res}{space 2} .2212404{col 38}{space 2} .0821033{col 49}{space 1}    2.69{col 58}{space 3}0.007{col 66}{space 4} .0603209{col 79}{space 3} .3821598
+{txt}{space 24} {c |}
+{space 20}year {c |}
+{space 19}2021  {c |}{col 26}{res}{space 2} .2947617{col 38}{space 2} .0514418{col 49}{space 1}    5.73{col 58}{space 3}0.000{col 66}{space 4} .1939376{col 79}{space 3} .3955858
+{txt}{space 24} {c |}
+{space 19}_cons {c |}{col 26}{res}{space 2} -1.01668{col 38}{space 2} .1006446{col 49}{space 1}  -10.10{col 58}{space 3}0.000{col 66}{space 4} -1.21394{col 79}{space 3}  -.81942
+{txt}{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}/mills                   {txt}{c |}
+{space 18}lambda {c |}{col 26}{res}{space 2}  1.86358{col 38}{space 2} 13.04885{col 49}{space 1}    0.14{col 58}{space 3}0.886{col 66}{space 4} -23.7117{col 79}{space 3} 27.43886
+{txt}{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+                     rho {c |} {res}   0.04289
+                   {txt}sigma {c |} {res} 43.446641
+{txt}{hline 25}{c BT}{hline 64}
+
+{com}. predict yhat, xb
+{txt}
+{com}. predict imr, mills
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. tabstat total_qty_w  yhat [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+{txt}{ralign 12:Variable} {...}
+{c |}      Mean       p50        SD       Min       Max
+{hline 13}{c +}{hline 50}
+{ralign 12:total_qty_w} {...}
+{c |}{...}
+ {res} 83.53299        20  223.9396         0      5150
+{txt}{ralign 12:yhat} {...}
+{c |}{...}
+ {res} 22.50624   22.5859  3.574414  13.01917  64.95273
+{txt}{hline 13}{c BT}{hline 50}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Nominal_price21p.dta", clear
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. 
+. tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+{txt}{ralign 12:Variable} {...}
+{c |}      Mean       p50        SD       Min       Max
+{hline 13}{c +}{hline 50}
+{ralign 12:total_qty_w} {...}
+{c |}{...}
+ {res} 83.53299        20  223.9396         0      5150
+{txt}{ralign 12:mrk_dist_w} {...}
+{c |}{...}
+ {res} 10.81569         9  7.433712         0        60
+{txt}{ralign 12:real_tpric~k} {...}
+{c |}{...}
+ {res} 10.74483     11.92  18.87425         0     766.6
+{txt}{ralign 12:real_maize~r} {...}
+{c |}{...}
+ {res}  257.768        26  698.1293        10      3000
+{txt}{ralign 12:real_rice_~r} {...}
+{c |}{...}
+ {res} 392.6721        50  1089.817        26      6000
+{txt}{ralign 12:num_mem} {...}
+{c |}{...}
+ {res} 5.572053         5  2.207343         1        20
+{txt}{ralign 12:hh_headage} {...}
+{c |}{...}
+ {res} 49.77197        46  11.18496        22        97
+{txt}{ralign 12:real_hhvalue} {...}
+{c |}{...}
+ {res} 4652.583      2170   7418.25      -294    101400
+{txt}{ralign 12:worker} {...}
+{c |}{...}
+ {res} 3.137488         3  1.578493         0        10
+{txt}{ralign 12:land_holding} {...}
+{c |}{...}
+ {res} 1.167866   .758317  1.200723   .062511    6.6006
+{txt}{hline 13}{c BT}{hline 50}
+
+{com}. 
+. 
+. 
+. misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert informal_save formal_bank
+{txt}(variables nonmissing or string)
+
+{com}. 
+. 
+. *replace hh_headage = 66 if hh_headage >66 //bottom 90%
+. replace land_holding = 2.341905 if land_holding >2.341905 //bottom 90%
+{txt}(290 real changes made)
+
+{com}.  
+. replace real_hhvalue = 0 if real_hhvalue <=0 //bottom 90%
+{txt}(109 real changes made)
+
+{com}. gen lland_holding = log(land_holding)
+{txt}
+{com}. gen lreal_hhvalue = log(real_hhvalue  + 1)
+{txt}
+{com}. 
+. *histogram lreal_hhvalue, width(5) frequency normal
+. *histogram land_holding, width(5) frequency normal
+. sum real_hhvalue, detail
+
+               {txt}total value of household asset
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}        0              0
+{txt} 5%    {res}        0              0
+{txt}10%    {res}        0              0       {txt}Obs         {res}      2,900
+{txt}25%    {res}        0              0       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}     1225                      {txt}Mean          {res} 4560.441
+                        {txt}Largest       Std. dev.     {res} 8881.608
+{txt}75%    {res}     6368         101400
+{txt}90%    {res}  12320.5         101400       {txt}Variance      {res} 7.89e+07
+{txt}95%    {res}  17567.5         101400       {txt}Skewness      {res} 6.019274
+{txt}99%    {res}    33015         101400       {txt}Kurtosis      {res} 58.04618
+{txt}
+{com}. sum land_holding, detail
+
+                  {txt}land holding in hectares
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}  .062511        .062511
+{txt} 5%    {res}   .06282        .062511
+{txt}10%    {res}  .106242        .062511       {txt}Obs         {res}      2,900
+{txt}25%    {res}   .26352        .062511       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}  .618245                      {txt}Mean          {res} .8672106
+                        {txt}Largest       Std. dev.     {res} .7377296
+{txt}75%    {res} 1.334435       2.341905
+{txt}90%    {res} 2.341905       2.341905       {txt}Variance      {res}  .544245
+{txt}95%    {res} 2.341905       2.341905       {txt}Skewness      {res} .8463143
+{txt}99%    {res} 2.341905       2.341905       {txt}Kurtosis      {res} 2.432526
+{txt}
+{com}. sum lland_holding, detail
+
+                        {txt}lland_holding
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}-2.772413      -2.772413
+{txt} 5%    {res}-2.767482      -2.772413
+{txt}10%    {res}-2.242058      -2.772413       {txt}Obs         {res}      2,900
+{txt}25%    {res}-1.333626      -2.772413       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}-.4808729                      {txt}Mean          {res}-.6039238
+                        {txt}Largest       Std. dev.     {res} 1.065231
+{txt}75%    {res} .2885079       .8509647
+{txt}90%    {res} .8509647       .8509647       {txt}Variance      {res} 1.134717
+{txt}95%    {res} .8509647       .8509647       {txt}Skewness      {res} -.429793
+{txt}99%    {res} .8509647       .8509647       {txt}Kurtosis      {res} 2.240959
+{txt}
+{com}. 
+. 
+. gen good_soil = (soil_qty_rev2==1)
+{txt}
+{com}. gen fair_soil = (soil_qty_rev2==2)
+{txt}
+{com}. 
+. sum real_tpricefert_cens_mrk, detail
+
+      {txt}price of commercial fertilizer purchased in naira
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}        0              0
+{txt} 5%    {res}        0              0
+{txt}10%    {res}        0              0       {txt}Obs         {res}      2,900
+{txt}25%    {res}        0              0       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}        0                      {txt}Mean          {res} 9.168471
+                        {txt}Largest       Std. dev.     {res} 24.35509
+{txt}75%    {res}     15.5            124
+{txt}90%    {res} 21.64583            650       {txt}Variance      {res} 593.1705
+{txt}95%    {res}       27            650       {txt}Skewness      {res} 23.08021
+{txt}99%    {res}       40          766.6       {txt}Kurtosis      {res} 653.9911
+{txt}
+{com}. 
+. local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert annual_mean_temp annual_precipitation informal_save formal_save formal_bank"
+{txt}
+{com}. 
+. foreach x in `time_avg' {c -(}
+{txt}  2{com}. 
+.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt}  3{com}. 
+. {c )-}
+{txt}
+{com}. 
+. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. *********Significant for only nominal at the log form
+. capture program drop myboot     
+{txt}
+{com}. program define myboot, rclass
+{txt}  1{com}. ** CRE-TOBIT
+.  preserve 
+{txt}  2{com}. 
+. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+{txt}  3{com}. predict yhat, xb
+{txt}  4{com}. predict imr, mills
+{txt}  5{com}. 
+. gen lyhat = log(yhat)
+{txt}  6{com}. gen ltotal_qty_w = log(total_qty_w + 1)
+{txt}  7{com}. 
+. *histogram total_qty_w, width(50) frequency normal
+. *histogram ltotal_qty_w, width(5) frequency normal
+. local time_avg "lyhat ltotal_qty_w"
+{txt}  8{com}. foreach x in `time_avg' {c -(}
+{txt}  9{com}.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt} 10{com}. {c )-}
+{txt} 11{com}. ** CRE-TOBIT 
+. tobit ltotal_qty_w lyhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  annual_mean_temp annual_precipitation   imr           TAvg_ltotal_qty_w TAvg_lyhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_org_fert i.year, ll(0)
+{txt} 12{com}. margins, predict(ystar(0,.)) dydx(*) post
+{txt} 13{com}. restore
+{txt} 14{com}. end
+{txt}
+{com}. bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+{res}{txt}(running {bf:myboot} on estimation sample)
+
+{p 0 9 2}
+warning: {bf:myboot} does not set {bf:e(sample)}, so no 
+observations will be excluded from the resampling because of 
+missing values or other reasons. To exclude observations, press 
+Break, save the data, drop any observations that are to be excluded, 
+and rerun {bf:bootstrap}.{p_end}
+{res}
+{text}Bootstrap replications ({result:100}){text}: {res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}10{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}20{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}30{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}40{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}50{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}60{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}70{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}80{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}90{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}100{text} done
+{res}
+{txt}{col 1}Average marginal effects{col 58}{lalign 13:Number of obs}{col 71} = {res}{ralign 5:2,900}
+{txt}{col 58}{lalign 13:Replications}{col 71} = {res}{ralign 5:100}
+
+{txt}{ralign 91:(Replications based on {res:1,450} clusters in {res:hhid})}
+{hline 26}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 27}{c |}   Observed{col 39}   Bootstrap{col 67}         Norm{col 80}al-based
+{col 27}{c |} coefficient{col 39}  std. err.{col 51}      z{col 59}   P>|z|{col 67}     [95% con{col 80}f. interval]
+{hline 26}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 20}lyhat {c |}{col 27}{res}{space 2} 5.488626{col 39}{space 2} 3.127221{col 50}{space 1}    1.76{col 59}{space 3}0.079{col 67}{space 4}-.6406153{col 80}{space 3} 11.61787
+{txt}{space 12}dist_admarc_w {c |}{col 27}{res}{space 2} .0063043{col 39}{space 2} .0033094{col 50}{space 1}    1.90{col 59}{space 3}0.057{col 67}{space 4}-.0001821{col 80}{space 3} .0127906
+{txt}{space 6}real_maize_price_mr {c |}{col 27}{res}{space 2}-.0001257{col 39}{space 2} .0002028{col 50}{space 1}   -0.62{col 59}{space 3}0.535{col 67}{space 4}-.0005232{col 80}{space 3} .0002718
+{txt}{space 7}real_rice_price_mr {c |}{col 27}{res}{space 2} .0002793{col 39}{space 2} .0001834{col 50}{space 1}    1.52{col 59}{space 3}0.128{col 67}{space 4}-.0000802{col 80}{space 3} .0006388
+{txt}{space 13}land_holding {c |}{col 27}{res}{space 2} .9974991{col 39}{space 2}  .435793{col 50}{space 1}    2.29{col 59}{space 3}0.022{col 67}{space 4} .1433606{col 80}{space 3} 1.851638
+{txt}{space 13}real_hhvalue {c |}{col 27}{res}{space 2}-.0000377{col 39}{space 2} .0000279{col 50}{space 1}   -1.35{col 59}{space 3}0.178{col 67}{space 4}-.0000924{col 80}{space 3} .0000171
+{txt}{space 17}org_fert {c |}{col 27}{res}{space 2}  .922715{col 39}{space 2} .5528837{col 50}{space 1}    1.67{col 59}{space 3}0.095{col 67}{space 4} -.160917{col 80}{space 3} 2.006347
+{txt}{space 9}annual_mean_temp {c |}{col 27}{res}{space 2}-.0023644{col 39}{space 2} .0204117{col 50}{space 1}   -0.12{col 59}{space 3}0.908{col 67}{space 4}-.0423706{col 80}{space 3} .0376418
+{txt}{space 5}annual_precipitation {c |}{col 27}{res}{space 2} .0031662{col 39}{space 2} .0022866{col 50}{space 1}    1.38{col 59}{space 3}0.166{col 67}{space 4}-.0013155{col 80}{space 3} .0076479
+{txt}{space 22}imr {c |}{col 27}{res}{space 2} -1.15107{col 39}{space 2} .2075778{col 50}{space 1}   -5.55{col 59}{space 3}0.000{col 67}{space 4}-1.557915{col 80}{space 3}-.7442248
+{txt}{space 8}TAvg_ltotal_qty_w {c |}{col 27}{res}{space 2} .8247432{col 39}{space 2}  .013851{col 50}{space 1}   59.54{col 59}{space 3}0.000{col 67}{space 4} .7975959{col 80}{space 3} .8518906
+{txt}{space 15}TAvg_lyhat {c |}{col 27}{res}{space 2}-6.953667{col 39}{space 2}  3.55619{col 50}{space 1}   -1.96{col 59}{space 3}0.051{col 67}{space 4}-13.92367{col 80}{space 3} .0163362
+{txt}{space 7}TAvg_dist_admarc_w {c |}{col 27}{res}{space 2}-.0026827{col 39}{space 2}   .00377{col 50}{space 1}   -0.71{col 59}{space 3}0.477{col 67}{space 4}-.0100718{col 80}{space 3} .0047064
+{txt}{space 1}TAvg_real_maize_price_mr {c |}{col 27}{res}{space 2} .0003408{col 39}{space 2}  .000242{col 50}{space 1}    1.41{col 59}{space 3}0.159{col 67}{space 4}-.0001336{col 80}{space 3} .0008152
+{txt}{space 2}TAvg_real_rice_price_mr {c |}{col 27}{res}{space 2}-.0004992{col 39}{space 2} .0002142{col 50}{space 1}   -2.33{col 59}{space 3}0.020{col 67}{space 4} -.000919{col 80}{space 3}-.0000793
+{txt}{space 8}TAvg_land_holding {c |}{col 27}{res}{space 2}-1.722899{col 39}{space 2} .4986443{col 50}{space 1}   -3.46{col 59}{space 3}0.001{col 67}{space 4}-2.700224{col 80}{space 3}-.7455739
+{txt}{space 8}TAvg_real_hhvalue {c |}{col 27}{res}{space 2} .0000451{col 39}{space 2} .0000309{col 50}{space 1}    1.46{col 59}{space 3}0.145{col 67}{space 4}-.0000155{col 80}{space 3} .0001057
+{txt}{space 4}TAvg_annual_mean_temp {c |}{col 27}{res}{space 2} .0012076{col 39}{space 2} .0204061{col 50}{space 1}    0.06{col 59}{space 3}0.953{col 67}{space 4}-.0387876{col 80}{space 3} .0412027
+{txt}TAvg_annual_precipitation {c |}{col 27}{res}{space 2}-.0030972{col 39}{space 2} .0022837{col 50}{space 1}   -1.36{col 59}{space 3}0.175{col 67}{space 4}-.0075733{col 80}{space 3} .0013788
+{txt}{space 12}TAvg_org_fert {c |}{col 27}{res}{space 2}-1.621192{col 39}{space 2} .6342092{col 50}{space 1}   -2.56{col 59}{space 3}0.011{col 67}{space 4} -2.86422{col 80}{space 3}-.3781653
+{txt}{space 25} {c |}
+{space 21}year {c |}
+{space 20}2021  {c |}{col 27}{res}{space 2}-.7020209{col 39}{space 2} .8075089{col 50}{space 1}   -0.87{col 59}{space 3}0.385{col 67}{space 4}-2.284709{col 80}{space 3} .8806676
+{txt}{hline 26}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. *Level
+. capture program drop myboot     
+{txt}
+{com}. program define myboot, rclass
+{txt}  1{com}. ** CRE-TOBIT
+.  preserve 
+{txt}  2{com}. 
+. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+{txt}  3{com}. predict yhat, xb
+{txt}  4{com}. predict imr, mills
+{txt}  5{com}. 
+. local time_avg "yhat"
+{txt}  6{com}. foreach x in `time_avg' {c -(}
+{txt}  7{com}.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt}  8{com}. {c )-}
+{txt}  9{com}. ** CRE-TOBIT 
+. tobit total_qty_w yhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  annual_mean_temp annual_precipitation   imr           TAvg_total_qty_w TAvg_yhat TAvg_dist_admarc_w TAvg_real_maize_price_mr TAvg_real_rice_price_mr TAvg_land_holding TAvg_real_hhvalue TAvg_annual_mean_temp TAvg_annual_precipitation TAvg_org_fert i.year, ll(0)
+{txt} 10{com}. margins, predict(ystar(0,.)) dydx(*) post
+{txt} 11{com}. restore
+{txt} 12{com}. end
+{txt}
+{com}. bootstrap, reps(100) seed(123) cluster(hhid) idcluster(newid): myboot
+{res}{txt}(running {bf:myboot} on estimation sample)
+
+{p 0 9 2}
+warning: {bf:myboot} does not set {bf:e(sample)}, so no 
+observations will be excluded from the resampling because of 
+missing values or other reasons. To exclude observations, press 
+Break, save the data, drop any observations that are to be excluded, 
+and rerun {bf:bootstrap}.{p_end}
+{res}
+{text}Bootstrap replications ({result:100}){text}: {res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}10{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}20{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}30{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}40{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}50{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}60{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}70{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}80{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}90{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}100{text} done
+{res}
+{txt}{col 1}Average marginal effects{col 58}{lalign 13:Number of obs}{col 71} = {res}{ralign 5:2,900}
+{txt}{col 58}{lalign 13:Replications}{col 71} = {res}{ralign 5:100}
+
+{txt}{ralign 91:(Replications based on {res:1,450} clusters in {res:hhid})}
+{hline 26}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 27}{c |}   Observed{col 39}   Bootstrap{col 67}         Norm{col 80}al-based
+{col 27}{c |} coefficient{col 39}  std. err.{col 51}      z{col 59}   P>|z|{col 67}     [95% con{col 80}f. interval]
+{hline 26}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 21}yhat {c |}{col 27}{res}{space 2} 6.383149{col 39}{space 2}  15.7286{col 50}{space 1}    0.41{col 59}{space 3}0.685{col 67}{space 4}-24.44434{col 80}{space 3} 37.21064
+{txt}{space 12}dist_admarc_w {c |}{col 27}{res}{space 2} .0767543{col 39}{space 2} .6070909{col 50}{space 1}    0.13{col 59}{space 3}0.899{col 67}{space 4}-1.113122{col 80}{space 3} 1.266631
+{txt}{space 6}real_maize_price_mr {c |}{col 27}{res}{space 2}  .008669{col 39}{space 2} .0396485{col 50}{space 1}    0.22{col 59}{space 3}0.827{col 67}{space 4}-.0690406{col 80}{space 3} .0863787
+{txt}{space 7}real_rice_price_mr {c |}{col 27}{res}{space 2} .0058451{col 39}{space 2} .0231543{col 50}{space 1}    0.25{col 59}{space 3}0.801{col 67}{space 4}-.0395366{col 80}{space 3} .0512268
+{txt}{space 13}land_holding {c |}{col 27}{res}{space 2} 23.60771{col 39}{space 2}  51.6751{col 50}{space 1}    0.46{col 59}{space 3}0.648{col 67}{space 4}-77.67362{col 80}{space 3}  124.889
+{txt}{space 13}real_hhvalue {c |}{col 27}{res}{space 2}-.0014436{col 39}{space 2} .0102739{col 50}{space 1}   -0.14{col 59}{space 3}0.888{col 67}{space 4}-.0215802{col 80}{space 3} .0186929
+{txt}{space 17}org_fert {c |}{col 27}{res}{space 2} 13.58349{col 39}{space 2} 81.68637{col 50}{space 1}    0.17{col 59}{space 3}0.868{col 67}{space 4}-146.5189{col 80}{space 3} 173.6858
+{txt}{space 9}annual_mean_temp {c |}{col 27}{res}{space 2} 2.469808{col 39}{space 2}   4.4068{col 50}{space 1}    0.56{col 59}{space 3}0.575{col 67}{space 4}-6.167361{col 80}{space 3} 11.10698
+{txt}{space 5}annual_precipitation {c |}{col 27}{res}{space 2} .6424833{col 39}{space 2} .3852576{col 50}{space 1}    1.67{col 59}{space 3}0.095{col 67}{space 4}-.1126078{col 80}{space 3} 1.397574
+{txt}{space 22}imr {c |}{col 27}{res}{space 2}-69.00108{col 39}{space 2} 19.75454{col 50}{space 1}   -3.49{col 59}{space 3}0.000{col 67}{space 4}-107.7193{col 80}{space 3}-30.28289
+{txt}{space 9}TAvg_total_qty_w {c |}{col 27}{res}{space 2}  .431387{col 39}{space 2} .0255809{col 50}{space 1}   16.86{col 59}{space 3}0.000{col 67}{space 4} .3812494{col 80}{space 3} .4815246
+{txt}{space 16}TAvg_yhat {c |}{col 27}{res}{space 2}-2.156153{col 39}{space 2}  87.6906{col 50}{space 1}   -0.02{col 59}{space 3}0.980{col 67}{space 4}-174.0266{col 80}{space 3} 169.7143
+{txt}{space 7}TAvg_dist_admarc_w {c |}{col 27}{res}{space 2}-.1139249{col 39}{space 2} 1.697767{col 50}{space 1}   -0.07{col 59}{space 3}0.946{col 67}{space 4}-3.441488{col 80}{space 3} 3.213638
+{txt}{space 1}TAvg_real_maize_price_mr {c |}{col 27}{res}{space 2}-.0069839{col 39}{space 2} .0436939{col 50}{space 1}   -0.16{col 59}{space 3}0.873{col 67}{space 4}-.0926224{col 80}{space 3} .0786546
+{txt}{space 2}TAvg_real_rice_price_mr {c |}{col 27}{res}{space 2}-.0004522{col 39}{space 2} .0632478{col 50}{space 1}   -0.01{col 59}{space 3}0.994{col 67}{space 4}-.1244157{col 80}{space 3} .1235112
+{txt}{space 8}TAvg_land_holding {c |}{col 27}{res}{space 2}-12.32865{col 39}{space 2} 35.04024{col 50}{space 1}   -0.35{col 59}{space 3}0.725{col 67}{space 4}-81.00625{col 80}{space 3} 56.34895
+{txt}{space 8}TAvg_real_hhvalue {c |}{col 27}{res}{space 2} .0009359{col 39}{space 2} .0306122{col 50}{space 1}    0.03{col 59}{space 3}0.976{col 67}{space 4}-.0590628{col 80}{space 3} .0609346
+{txt}{space 4}TAvg_annual_mean_temp {c |}{col 27}{res}{space 2}-2.943837{col 39}{space 2} 4.457651{col 50}{space 1}   -0.66{col 59}{space 3}0.509{col 67}{space 4}-11.68067{col 80}{space 3} 5.792999
+{txt}TAvg_annual_precipitation {c |}{col 27}{res}{space 2}-.6440934{col 39}{space 2}  .385552{col 50}{space 1}   -1.67{col 59}{space 3}0.095{col 67}{space 4}-1.399761{col 80}{space 3} .1115747
+{txt}{space 12}TAvg_org_fert {c |}{col 27}{res}{space 2}        0{col 39}{txt}  (omitted)
+{space 25} {c |}
+{space 21}year {c |}
+{space 20}2021  {c |}{col 27}{res}{space 2}        .{col 39}{txt}  (not estimable)
+{hline 26}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert  i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert good_soil fair_soil  i.year) twostep
+{res}
+{txt}Heckman selection model -- two-step estimates   Number of obs     = {res}     2,900
+{txt}(regression model with sample selection)              Selected    = {res}     1,427
+                                                {txt}      Nonselected = {res}     1,473
+
+                                                {txt}Wald chi2({res}7{txt})      =  {res}    20.29
+                                                {txt}Prob > chi2       =     {res}0.0050
+
+{txt}{hline 25}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 26}{c |} Coefficient{col 38}  Std. err.{col 50}      z{col 58}   P>|z|{col 66}     [95% con{col 79}f. interval]
+{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}real_tpricefert_cens_mrk {txt}{c |}
+{space 11}dist_admarc_w {c |}{col 26}{res}{space 2} .0111406{col 38}{space 2} .0284566{col 49}{space 1}    0.39{col 58}{space 3}0.695{col 66}{space 4}-.0446334{col 79}{space 3} .0669146
+{txt}{space 5}real_maize_price_mr {c |}{col 26}{res}{space 2}  .000791{col 38}{space 2} .0018698{col 49}{space 1}    0.42{col 58}{space 3}0.672{col 66}{space 4}-.0028737{col 79}{space 3} .0044557
+{txt}{space 6}real_rice_price_mr {c |}{col 26}{res}{space 2}-.0014156{col 38}{space 2} .0012827{col 49}{space 1}   -1.10{col 58}{space 3}0.270{col 66}{space 4}-.0039295{col 79}{space 3} .0010984
+{txt}{space 12}land_holding {c |}{col 26}{res}{space 2}-3.793173{col 38}{space 2} 2.855972{col 49}{space 1}   -1.33{col 58}{space 3}0.184{col 66}{space 4}-9.390774{col 79}{space 3} 1.804429
+{txt}{space 12}real_hhvalue {c |}{col 26}{res}{space 2} .0001484{col 38}{space 2} .0001024{col 49}{space 1}    1.45{col 58}{space 3}0.147{col 66}{space 4}-.0000524{col 79}{space 3} .0003492
+{txt}{space 16}org_fert {c |}{col 26}{res}{space 2}-5.053946{col 38}{space 2} 5.348339{col 49}{space 1}   -0.94{col 58}{space 3}0.345{col 66}{space 4} -15.5365{col 79}{space 3} 5.428607
+{txt}{space 24} {c |}
+{space 20}year {c |}
+{space 19}2021  {c |}{col 26}{res}{space 2} 4.806411{col 38}{space 2} 2.477536{col 49}{space 1}    1.94{col 58}{space 3}0.052{col 66}{space 4}-.0494697{col 79}{space 3} 9.662293
+{txt}{space 24} {c |}
+{space 19}_cons {c |}{col 26}{res}{space 2} 28.33051{col 38}{space 2}  13.7104{col 49}{space 1}    2.07{col 58}{space 3}0.039{col 66}{space 4} 1.458611{col 79}{space 3}  55.2024
+{txt}{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}commercial_dummy         {txt}{c |}
+{space 11}dist_admarc_w {c |}{col 26}{res}{space 2}-.0031656{col 38}{space 2} .0005523{col 49}{space 1}   -5.73{col 58}{space 3}0.000{col 66}{space 4}-.0042482{col 79}{space 3} -.002083
+{txt}{space 5}real_maize_price_mr {c |}{col 26}{res}{space 2}-.0001326{col 38}{space 2} .0000596{col 49}{space 1}   -2.23{col 58}{space 3}0.026{col 66}{space 4}-.0002494{col 79}{space 3}-.0000158
+{txt}{space 6}real_rice_price_mr {c |}{col 26}{res}{space 2}  .000176{col 38}{space 2} .0000388{col 49}{space 1}    4.53{col 58}{space 3}0.000{col 66}{space 4} .0000999{col 79}{space 3} .0002521
+{txt}{space 12}land_holding {c |}{col 26}{res}{space 2}  .496693{col 38}{space 2} .0354459{col 49}{space 1}   14.01{col 58}{space 3}0.000{col 66}{space 4} .4272203{col 79}{space 3} .5661656
+{txt}{space 12}real_hhvalue {c |}{col 26}{res}{space 2}-1.31e-06{col 38}{space 2} 3.13e-06{col 49}{space 1}   -0.42{col 58}{space 3}0.675{col 66}{space 4}-7.45e-06{col 79}{space 3} 4.82e-06
+{txt}{space 16}org_fert {c |}{col 26}{res}{space 2} .7574751{col 38}{space 2}  .055059{col 49}{space 1}   13.76{col 58}{space 3}0.000{col 66}{space 4} .6495614{col 79}{space 3} .8653889
+{txt}{space 15}good_soil {c |}{col 26}{res}{space 2}-.0772173{col 38}{space 2} .0900454{col 49}{space 1}   -0.86{col 58}{space 3}0.391{col 66}{space 4}-.2537029{col 79}{space 3} .0992684
+{txt}{space 15}fair_soil {c |}{col 26}{res}{space 2}  .223745{col 38}{space 2} .0821656{col 49}{space 1}    2.72{col 58}{space 3}0.006{col 66}{space 4} .0627034{col 79}{space 3} .3847865
+{txt}{space 24} {c |}
+{space 20}year {c |}
+{space 19}2021  {c |}{col 26}{res}{space 2} .2894729{col 38}{space 2}  .054121{col 49}{space 1}    5.35{col 58}{space 3}0.000{col 66}{space 4} .1833976{col 79}{space 3} .3955482
+{txt}{space 24} {c |}
+{space 19}_cons {c |}{col 26}{res}{space 2}-1.043379{col 38}{space 2} .1002248{col 49}{space 1}  -10.41{col 58}{space 3}0.000{col 66}{space 4}-1.239816{col 79}{space 3}-.8469421
+{txt}{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}/mills                   {txt}{c |}
+{space 18}lambda {c |}{col 26}{res}{space 2}-7.642084{col 38}{space 2}  9.88547{col 49}{space 1}   -0.77{col 58}{space 3}0.439{col 66}{space 4}-27.01725{col 79}{space 3} 11.73308
+{txt}{hline 25}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+                     rho {c |} {res}  -0.23617
+                   {txt}sigma {c |} {res} 32.358997
+{txt}{hline 25}{c BT}{hline 64}
+
+{com}. predict yhat, xb
+{txt}
+{com}. predict imr, mills
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. tabstat total_qty_w  yhat [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+{txt}{ralign 12:Variable} {...}
+{c |}      Mean       p50        SD       Min       Max
+{hline 13}{c +}{hline 50}
+{ralign 12:total_qty_w} {...}
+{c |}{...}
+ {res} 83.53299        20  223.9396         0      5150
+{txt}{ralign 12:yhat} {...}
+{c |}{...}
+ {res} 24.57815   24.1846  4.605287  13.10676  41.96292
+{txt}{hline 13}{c BT}{hline 50}
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. use "C:\Users\obine\Music\Documents\Project\codes\Ethiopia\complete\Real_price21p.dta", clear
+{txt}
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. 
+. tabstat total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr num_mem hh_headage real_hhvalue worker land_holding [aweight = weight], statistics( mean median sd min max ) columns(statistics)
+
+{txt}{ralign 12:Variable} {...}
+{c |}      Mean       p50        SD       Min       Max
+{hline 13}{c +}{hline 50}
+{ralign 12:total_qty_w} {...}
+{c |}{...}
+ {res} 83.53299        20  223.9396         0      5150
+{txt}{ralign 12:mrk_dist_w} {...}
+{c |}{...}
+ {res} 10.81569         9  7.433712         0        60
+{txt}{ralign 12:real_tpric~k} {...}
+{c |}{...}
+ {res} 13.32978      16.4  21.21731         0  1355.305
+{txt}{ralign 12:real_maize~r} {...}
+{c |}{...}
+ {res} 273.9273        26   707.651  17.67943      3000
+{txt}{ralign 12:real_rice_~r} {...}
+{c |}{...}
+ {res}  432.002  53.03829  1112.031        45      6000
+{txt}{ralign 12:num_mem} {...}
+{c |}{...}
+ {res} 5.572053         5  2.207343         1        20
+{txt}{ralign 12:hh_headage} {...}
+{c |}{...}
+ {res} 49.77197        46  11.18496        22        97
+{txt}{ralign 12:real_hhvalue} {...}
+{c |}{...}
+ {res} 5041.943      2221  10142.36 -519.7752  179269.4
+{txt}{ralign 12:worker} {...}
+{c |}{...}
+ {res} 3.137488         3  1.578493         0        10
+{txt}{ralign 12:land_holding} {...}
+{c |}{...}
+ {res} 1.167866   .758317  1.200723   .062511    6.6006
+{txt}{hline 13}{c BT}{hline 50}
+
+{com}. 
+. 
+. 
+. misstable summarize femhead formal_credit informal_credit ext_acess attend_sch  safety_net  total_qty_w mrk_dist_w real_tpricefert_cens_mrk num_mem hh_headage real_hhvalue worker land_holding soil_qty_rev2 real_maize_price_mr real_rice_price_mr net_seller net_buyer  region dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert informal_save formal_bank
+{txt}(variables nonmissing or string)
+
+{com}. 
+. 
+. *replace hh_headage = 66 if hh_headage >66 //bottom 90%
+. replace land_holding = 2.341905 if land_holding >2.341905 //bottom 90%
+{txt}(290 real changes made)
+
+{com}.  
+. replace real_hhvalue = 0 if real_hhvalue <=0 //bottom 90%
+{txt}(109 real changes made)
+
+{com}. gen lland_holding = log(land_holding)
+{txt}
+{com}. gen lreal_hhvalue = log(real_hhvalue  + 1)
+{txt}
+{com}. 
+. *histogram lreal_hhvalue, width(5) frequency normal
+. *histogram land_holding, width(5) frequency normal
+. sum real_hhvalue, detail
+
+               {txt}total value of household asset
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}        0              0
+{txt} 5%    {res}        0              0
+{txt}10%    {res}        0              0       {txt}Obs         {res}      2,900
+{txt}25%    {res}        0              0       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}   1316.5                      {txt}Mean          {res} 5260.394
+                        {txt}Largest       Std. dev.     {res} 13573.54
+{txt}75%    {res}     6629       179269.4
+{txt}90%    {res}    12870       179269.4       {txt}Variance      {res} 1.84e+08
+{txt}95%    {res}    18496       179269.4       {txt}Skewness      {res} 9.167063
+{txt}99%    {res} 37157.74       179269.4       {txt}Kurtosis      {res} 109.0722
+{txt}
+{com}. sum land_holding, detail
+
+                  {txt}land holding in hectares
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}  .062511        .062511
+{txt} 5%    {res}   .06282        .062511
+{txt}10%    {res}  .106242        .062511       {txt}Obs         {res}      2,900
+{txt}25%    {res}   .26352        .062511       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}  .618245                      {txt}Mean          {res} .8672106
+                        {txt}Largest       Std. dev.     {res} .7377296
+{txt}75%    {res} 1.334435       2.341905
+{txt}90%    {res} 2.341905       2.341905       {txt}Variance      {res}  .544245
+{txt}95%    {res} 2.341905       2.341905       {txt}Skewness      {res} .8463143
+{txt}99%    {res} 2.341905       2.341905       {txt}Kurtosis      {res} 2.432526
+{txt}
+{com}. sum lland_holding, detail
+
+                        {txt}lland_holding
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}-2.772413      -2.772413
+{txt} 5%    {res}-2.767482      -2.772413
+{txt}10%    {res}-2.242058      -2.772413       {txt}Obs         {res}      2,900
+{txt}25%    {res}-1.333626      -2.772413       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}-.4808729                      {txt}Mean          {res}-.6039238
+                        {txt}Largest       Std. dev.     {res} 1.065231
+{txt}75%    {res} .2885079       .8509647
+{txt}90%    {res} .8509647       .8509647       {txt}Variance      {res} 1.134717
+{txt}95%    {res} .8509647       .8509647       {txt}Skewness      {res} -.429793
+{txt}99%    {res} .8509647       .8509647       {txt}Kurtosis      {res} 2.240959
+{txt}
+{com}. 
+. 
+. gen good_soil = (soil_qty_rev2==1)
+{txt}
+{com}. gen fair_soil = (soil_qty_rev2==2)
+{txt}
+{com}. 
+. sum real_tpricefert_cens_mrk, detail
+
+      {txt}price of commercial fertilizer purchased in naira
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}        0              0
+{txt} 5%    {res}        0              0
+{txt}10%    {res}        0              0       {txt}Obs         {res}      2,900
+{txt}25%    {res}        0              0       {txt}Sum of wgt. {res}      2,900
+
+{txt}50%    {res}        0                      {txt}Mean          {res} 11.70962
+                        {txt}Largest       Std. dev.     {res} 32.84718
+{txt}75%    {res} 21.21532       219.2249
+{txt}90%    {res} 26.51914            650       {txt}Variance      {res} 1078.937
+{txt}95%    {res}       30            650       {txt}Skewness      {res} 28.81431
+{txt}99%    {res} 44.88216       1355.305       {txt}Kurtosis      {res} 1065.092
+{txt}
+{com}. 
+. local time_avg "total_qty_w mrk_dist_w real_tpricefert_cens_mrk real_maize_price_mr real_rice_price_mr net_seller net_buyer num_mem hh_headage real_hhvalue worker land_holding femhead formal_credit informal_credit ext_acess attend_sch  safety_net soil_qty_rev2 lland_holding lreal_hhvalue dist_admarc_w plot_elevation plot_slope plot_wetness hh_elevation hh_slope hh_wetness org_fert annual_mean_temp annual_precipitation informal_save formal_save formal_bank"
+{txt}
+{com}. 
+. foreach x in `time_avg' {c -(}
+{txt}  2{com}. 
+.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt}  3{com}. 
+. {c )-}
+{txt}
+{com}. 
+. 
+{txt}end of do-file
+
+{com}. do "C:\Users\obine\AppData\Local\Temp\STD1a1c_000000.tmp"
+{txt}
+{com}. 
+. gen float hhid1 = real(hhid)
+{txt}
+{com}. 
+. 
+. capture program drop myboot     
+{txt}
+{com}. program define myboot, rclass
+{txt}  1{com}. ** CRE-TOBIT
+.  preserve 
+{txt}  2{com}. heckman real_tpricefert_cens_mrk dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem   i.year, select (commercial_dummy= dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead num_mem   good_soil fair_soil  i.year) twostep
+{txt}  3{com}. predict yhat, xb
+{txt}  4{com}. predict imr, mills
+{txt}  5{com}. 
+. 
+. gen lyhat = log(yhat)
+{txt}  6{com}. gen ltotal_qty_w = log(total_qty_w + 1)
+{txt}  7{com}. local time_avg "lyhat ltotal_qty_w yhat"
+{txt}  8{com}. foreach x in `time_avg' {c -(}
+{txt}  9{com}.         bysort hhid : egen TAvg_`x' = mean(`x')
+{txt} 10{com}. {c )-}
+{txt} 11{com}. 
+. 
+. ** CRE-TOBIT 
+. xtreg ltotal_qty_w lyhat dist_admarc_w real_maize_price_mr real_rice_price_mr land_holding real_hhvalue org_fert hh_headage attend_sch femhead   num_mem  imr  i.year, fe i(hhid1)
+{txt} 12{com}. restore
+{txt} 13{com}. end
+{txt}
+{com}. bootstrap, reps(100) seed(123) cluster(hhid1) idcluster(newid): myboot
+{res}{txt}(running {bf:myboot} on estimation sample)
+
+{p 0 9 2}
+warning: {bf:myboot} does not set {bf:e(sample)}, so no 
+observations will be excluded from the resampling because of 
+missing values or other reasons. To exclude observations, press 
+Break, save the data, drop any observations that are to be excluded, 
+and rerun {bf:bootstrap}.{p_end}
+{res}
+{text}Bootstrap replications ({result:100}){text}: {res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}10{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}20{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}30{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}40{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}50{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}60{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}70{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}80{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}90{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}.{res}{text}100{text} done
+{res}
+{txt}Bootstrap results
+
+{col 54}{lalign 16:Number of obs}{col 70} = {res}{ralign 6:2,900}
+{txt}{col 54}{lalign 16:Replications}{col 70} = {res}{ralign 6:100}
+{txt}{col 1}{txt}Group variable: {res}hhid1{txt}{col 54}{lalign 16:Number of groups}{col 70} = {res}{ralign 6:120}
+
+{txt}{col 54}Obs per group:
+{col 54}{ralign 16:min}{col 70} = {res}{ralign 6:2}
+{txt}{col 54}{ralign 16:avg}{col 70} = {res}{ralign 6:24.2}
+{txt}{col 54}{ralign 16:max}{col 70} = {res}{ralign 6:180}
+
+{txt}{col 54}{lalign 16:Wald chi2({res:13})}{col 70} = {res}{ralign 6:72.42}
+{txt}{col 54}{lalign 16:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+{txt}{col 54}{lalign 16:R-squared}{col 70} = {res}{ralign 6:0.2172}
+{txt}{col 54}{lalign 16:Adj R-squared}{col 70} = {res}{ralign 6:0.1798}
+{txt}{col 54}{lalign 16:Root MSE}{col 70} = {res}{ralign 6:1.4122}
+
+{txt}{ralign 85:(Replications based on {res:120} clusters in {res:hhid1})}
+{hline 20}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 21}{c |}   Observed{col 33}   Bootstrap{col 61}         Norm{col 74}al-based
+{col 1}       ltotal_qty_w{col 21}{c |} coefficient{col 33}  std. err.{col 45}      z{col 53}   P>|z|{col 61}     [95% con{col 74}f. interval]
+{hline 20}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 14}lyhat {c |}{col 21}{res}{space 2}-.7239156{col 33}{space 2} 2.580014{col 44}{space 1}   -0.28{col 53}{space 3}0.779{col 61}{space 4} -5.78065{col 74}{space 3} 4.332819
+{txt}{space 6}dist_admarc_w {c |}{col 21}{res}{space 2} .0078075{col 33}{space 2} .0057045{col 44}{space 1}    1.37{col 53}{space 3}0.171{col 61}{space 4}-.0033731{col 74}{space 3} .0189882
+{txt}real_maize_price_mr {c |}{col 21}{res}{space 2} .0000597{col 33}{space 2} .0002708{col 44}{space 1}    0.22{col 53}{space 3}0.825{col 61}{space 4}-.0004711{col 74}{space 3} .0005905
+{txt}{space 1}real_rice_price_mr {c |}{col 21}{res}{space 2} .0000636{col 33}{space 2} .0002057{col 44}{space 1}    0.31{col 53}{space 3}0.757{col 61}{space 4}-.0003395{col 74}{space 3} .0004667
+{txt}{space 7}land_holding {c |}{col 21}{res}{space 2} .8289407{col 33}{space 2} .4217111{col 44}{space 1}    1.97{col 53}{space 3}0.049{col 61}{space 4}  .002402{col 74}{space 3} 1.655479
+{txt}{space 7}real_hhvalue {c |}{col 21}{res}{space 2} 6.13e-06{col 33}{space 2} 9.00e-06{col 44}{space 1}    0.68{col 53}{space 3}0.496{col 61}{space 4}-.0000115{col 74}{space 3} .0000238
+{txt}{space 11}org_fert {c |}{col 21}{res}{space 2} .3658873{col 33}{space 2}  .482435{col 44}{space 1}    0.76{col 53}{space 3}0.448{col 61}{space 4} -.579668{col 74}{space 3} 1.311443
+{txt}{space 9}hh_headage {c |}{col 21}{res}{space 2}-.0160273{col 33}{space 2} .0080232{col 44}{space 1}   -2.00{col 53}{space 3}0.046{col 61}{space 4}-.0317524{col 74}{space 3}-.0003021
+{txt}{space 9}attend_sch {c |}{col 21}{res}{space 2} .1366866{col 33}{space 2} .1680459{col 44}{space 1}    0.81{col 53}{space 3}0.416{col 61}{space 4}-.1926773{col 74}{space 3} .4660505
+{txt}{space 12}femhead {c |}{col 21}{res}{space 2}-.3250689{col 33}{space 2}  .300884{col 44}{space 1}   -1.08{col 53}{space 3}0.280{col 61}{space 4}-.9147907{col 74}{space 3} .2646529
+{txt}{space 12}num_mem {c |}{col 21}{res}{space 2} .0490429{col 33}{space 2} .0499219{col 44}{space 1}    0.98{col 53}{space 3}0.326{col 61}{space 4}-.0488021{col 74}{space 3}  .146888
+{txt}{space 16}imr {c |}{col 21}{res}{space 2} .2380785{col 33}{space 2} .6203349{col 44}{space 1}    0.38{col 53}{space 3}0.701{col 61}{space 4}-.9777556{col 74}{space 3} 1.453913
+{txt}{space 19} {c |}
+{space 15}year {c |}
+{space 14}2021  {c |}{col 21}{res}{space 2}  .496154{col 33}{space 2} .5839338{col 44}{space 1}    0.85{col 53}{space 3}0.396{col 61}{space 4}-.6483353{col 74}{space 3} 1.640643
+{txt}{space 19} {c |}
+{space 14}_cons {c |}{col 21}{res}{space 2} 2.858486{col 33}{space 2} 9.222631{col 44}{space 1}    0.31{col 53}{space 3}0.757{col 61}{space 4}-15.21754{col 74}{space 3} 20.93451
+{txt}{hline 20}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+{txt}end of do-file
+
+{com}. exit, clear
